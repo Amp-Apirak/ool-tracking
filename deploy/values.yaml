@@ -1,0 +1,21 @@
+site: "ool"
+replica: 1
+
+image:
+  repository: "regis.pointit.co.th/ool/tracking"
+  tag: "0.1.51"
+
+api:
+  url: "https://ool.kudsonmoo.co/apij"
+
+config:
+  title: "ATIS (Prod)"
+  version: "V.24"
+  mainPath: "https://ool.kudsonmoo.co/apij"
+  basePath: "/tracking"
+  endpoint: "https://ool.kudsonmoo.co/apij"
+  keycloak:
+    baseUrl: "https://ool.kudsonmoo.co/sso"
+    realm: "ool"
+    clientId: "gw"
+    clientSecret: "NNzmkwL1z50fEjauFz2zckxq01N0QQyD"

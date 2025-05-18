@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tracking
+  namespace: cicd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/pointitconsulting/ool-tracking.git
+    path: deploy
+    targetRevision: HEAD
+    helm:
+      releaseName: tracking  # ตั้งชื่อ release
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ool
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true  # ให้ ArgoCD สร้าง namespace ให้อัตโนมัติ
+      # - ApplyOutOfSyncOnly=true  # ให้ Apply เฉพาะของที่ OutOfSync เท่านั้น

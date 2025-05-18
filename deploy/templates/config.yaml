@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracking-config
+  namespace: "{{ .Values.site }}"
+data:
+  VITE_APP_TITLE: "{{ .Values.config.title }}"
+  VITE_VERSION: "{{ .Values.config.version }}"
+  VITE_API_MAIN_PATH: "{{ .Values.config.mainPath }}"
+  VITE_APP_BASE_PATH: "{{ .Values.config.basePath }}"
+  VITE_API_ENDPOINT: "{{ .Values.config.endpoint }}"
+  VITE_KEYCLOAK_BASE_URL: "{{ .Values.config.keycloak.baseUrl }}"
+  VITE_KEYCLOAK_REALM: "{{ .Values.config.keycloak.realm }}"
+  VITE_KEYCLOAK_CLIENT_ID: "{{ .Values.config.keycloak.clientId }}"

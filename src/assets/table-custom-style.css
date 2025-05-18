@@ -1,0 +1,40 @@
+/* table-custom-styles.css */
+/* class="elevation-1 custom-table" */
+.custom-table {
+    background-color: #ffffff !important;
+}
+
+.custom-table th {
+    color: rgba(2, 2, 2, 0.9) !important;
+    background-color: #a6d6d6 !important;
+    font-weight: bold;
+}
+
+.v-card {
+    background-color: #f5f5f5;
+}
+
+.v-btn {
+    text-transform: none;
+}
+
+.v-container {
+    color: black;
+}
+
+.deleted-row {
+    color: rgba(0, 0, 0, 0.38) !important;
+}
+
+.theme--dark .deleted-row {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Hover row color */
+.v-theme--light.v-data-table > .v-table__wrapper > table > tbody > tr:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) > td {
+    background: #ccccca;
+}
+
+.completed-row {
+    color: #2cbc4d !important;            /* Darker text color to improve readability */
+}

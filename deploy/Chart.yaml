@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tracking
+description: A Helm chart for deploying tracking application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
