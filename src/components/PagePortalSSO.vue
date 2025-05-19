@@ -52,7 +52,7 @@ onMounted(async () => {
     //const data = await res.json();
     const data = {
       token:
-        "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbnZlbnRvcnlfYWRtaW4iLCJpYXQiOjE3NDc2NDY2MzEsImV4cCI6MTc0NzY1MDIzMSwicm9sZXMiOlsiYWRtaW4iLCJ2aXNpdG9yIl0sImlzQWRtaW4iOmZhbHNlfQ.0QNbetni040x1kYF33R1MIR1_D7jOq-jOWeRHxr0G1TzZsxkf2TpmxZHcHVJ5uRz6n3JZXIUU9IEO7iUgjAuMQ",
+        "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcl9hZG1pbiIsImlhdCI6MTc0NzY2NjIyNCwiZXhwIjoxNzQ3NjY5ODI0LCJyb2xlcyI6WyJhZG1pbiJdLCJpc0FkbWluIjp0cnVlfQ.ezmrVAdmqIOGdi1DjxIR9rwGxXWv-s1FBpyJYO8j0Z9RI7M83eZ_lfAoIBTBLGVqc7DdpHVXnA7HDqrapf4GkA",
       accessToken:
         "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb2FwX3ZhbGxleSIsImp0aSI6ImE5NDAyOWI1LWZhZjUtNGU0Ny1hMjBjLThjMjgxOWE5OTY0NSIsImlhdCI6MTc0NzE5NDQyMiwicm9sZXMiOiIiLCJleHAiOjE3NDcxOTgwMjIsImlzcyI6IlVNUyIsImF1ZCI6IjI4MWp6NzVjYTB5NWRybDMxZzl1eWNvMmZ2d2lxdTA1In0.TCILLZV8iUgzmA3ZX4fZzHdYIUhiPpdNgHqMI5m5ZRo",
       userProfile: {
