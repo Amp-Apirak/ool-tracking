@@ -286,13 +286,17 @@
 
     <!-- User Edit/Add Dialog -->
     <v-dialog v-model="userDialog.show" max-width="900px" class="user-dialog">
-      <v-card v-if="userDialog.show" class="dialog-card">
+      <v-card v-if="userDialog.show" class="dialog-card" elevation="10">
         <v-card-title class="dialog-header d-flex justify-space-between">
           <div class="d-flex align-center">
-            <v-icon size="24" color="white" class="me-2">
-              {{ userDialog.isEdit ? "mdi-account-edit" : "mdi-account-plus" }}
-            </v-icon>
-            <span>{{
+            <v-avatar color="white" size="36" class="me-3">
+              <v-icon size="24" color="primary">
+                {{
+                  userDialog.isEdit ? "mdi-account-edit" : "mdi-account-plus"
+                }}
+              </v-icon>
+            </v-avatar>
+            <span class="text-h6">{{
               userDialog.isEdit ? t("map_user_to_organization") : t("add_user")
             }}</span>
           </div>
@@ -302,226 +306,358 @@
             size="small"
             @click="userDialog.show = false"
             color="white"
+            class="close-btn"
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
 
-        <v-card-text class="pa-4">
+        <v-card-text class="pa-0">
           <v-form
             ref="userForm"
             v-model="userDialog.valid"
             @submit.prevent="saveUser"
           >
-            <v-row class="mb-4">
-              <!-- ข้อมูลผู้ใช้งาน -->
-              <v-col cols="12">
-                <div class="section-title mb-4">
-                  <v-icon size="small" color="primary" class="me-2"
-                    >mdi-account-details</v-icon
+            <!-- User Information Section -->
+            <div class="dialog-section user-info-section">
+              <div class="section-header">
+                <v-icon size="20" color="primary" class="me-2"
+                  >mdi-account-details</v-icon
+                >
+                <span class="text-h6">{{ t("user_details") }}</span>
+              </div>
+
+              <v-row class="mt-3">
+                <!-- Username field -->
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="userDialog.user.username"
+                    :label="t('user_name')"
+                    variant="outlined"
+                    :rules="[requiredRule, usernameRules]"
+                    :readonly="userDialog.isEdit"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                    prepend-inner-icon="mdi-account"
                   >
-                  {{ t("user_details") }}
-                </div>
-              </v-col>
-
-              <!-- User details section with conditional rendering based on edit mode -->
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model="userDialog.user.username"
-                  :label="t('user_name')"
-                  variant="outlined"
-                  :rules="[requiredRule, usernameRules]"
-                  :readonly="userDialog.isEdit"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-account"
-                ></v-text-field>
-              </v-col>
-
-              <!-- Only show roles field when NOT in edit mode -->
-              <v-col v-if="!userDialog.isEdit" cols="12" md="6">
-                <v-select
-                  v-model="userDialog.user.roles"
-                  :items="clientRoles"
-                  :label="t('roles')"
-                  variant="outlined"
-                  :rules="[requiredRule]"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-shield-account"
-                ></v-select>
-              </v-col>
-
-              <!-- ชื่อจริง -->
-              <v-col v-if="!userDialog.isEdit" cols="12" md="6">
-                <v-text-field
-                  v-model="userDialog.user.firstName"
-                  :label="t('first_name')"
-                  variant="outlined"
-                  :rules="[requiredRule]"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-card-account-details"
-                ></v-text-field>
-              </v-col>
-
-              <!-- นามสกุล -->
-              <v-col v-if="!userDialog.isEdit" cols="12" md="6">
-                <v-text-field
-                  v-model="userDialog.user.lastName"
-                  :label="t('last_name')"
-                  variant="outlined"
-                  :rules="[requiredRule]"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-card-account-details-outline"
-                ></v-text-field>
-              </v-col>
-
-              <!-- อีเมล -->
-              <v-col v-if="!userDialog.isEdit" cols="12" md="6">
-                <v-text-field
-                  v-model="userDialog.user.email"
-                  :label="t('email')"
-                  variant="outlined"
-                  :rules="[requiredRule]"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-email"
-                ></v-text-field>
-              </v-col>
-
-              <!-- Password field - only show when NOT in edit mode -->
-              <v-col v-if="!userDialog.isEdit" cols="12" md="6">
-                <v-text-field
-                  v-model="userDialog.user.password"
-                  :label="t('password')"
-                  variant="outlined"
-                  :rules="[requiredRule]"
-                  type="password"
-                  density="comfortable"
-                  bg-color="white"
-                  hide-details="auto"
-                  class="input-field mb-4"
-                  prepend-inner-icon="mdi-lock"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-
-            <v-divider class="my-4"></v-divider>
-
-            <!-- ส่วนแสดงสิทธิ์การเข้าถึงองค์กรปัจจุบัน -->
-            <v-row class="mb-4">
-              <v-col cols="12">
-                <div class="section-title mb-4">
-                  <v-icon size="small" color="primary" class="me-2"
-                    >mdi-office-building</v-icon
-                  >
-                  {{ t("current_organization_access") }}
-                </div>
-
-                <!-- แสดงการเข้าถึงองค์กรปัจจุบันในรูปแบบ chip -->
-                <div class="d-flex flex-column gap-2 mb-4">
-                  <div
-                    v-for="(org, idx) in userDialog.user.organizationAccess"
-                    :key="idx"
-                    class="d-flex align-center"
-                  >
-                    <v-chip
-                      closable
-                      :color="getOrgColor(org.organizationId)"
-                      class="flex-grow-1 org-access-chip"
-                      variant="elevated"
-                      text-color="white"
-                      @click:close="removeOrgAccess(idx)"
-                    >
-                      <v-tooltip activator="parent" location="start">
-                        <template v-slot:default>
-                          {{ org.path }}
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-account</v-icon
+                          >
                         </template>
+                        <span>{{ t("user_name") }}</span>
                       </v-tooltip>
-                      <v-icon start icon="mdi-tag" class="me-2"></v-icon>
-                      <span class="font-weight-bold">{{ org.nodeType }}: </span>
-                      {{ getLastPathSegment(org.path) }}
-                    </v-chip>
-                  </div>
+                    </template>
+                  </v-text-field>
+                </v-col>
+
+                <!-- Only show roles field when NOT in edit mode -->
+                <v-col v-if="!userDialog.isEdit" cols="12" md="6">
+                  <v-select
+                    v-model="userDialog.user.roles"
+                    :items="clientRoles"
+                    :label="t('roles')"
+                    variant="outlined"
+                    :rules="[requiredRule]"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                    item-title="title"
+                    item-value="value"
+                    return-object
+                    chips
+                  >
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-shield-account</v-icon
+                          >
+                        </template>
+                        <span>{{ t("roles") }}</span>
+                      </v-tooltip>
+                    </template>
+                    <template v-slot:selection="{ item }">
+                      <v-chip
+                        :color="getClientColor(item.value)"
+                        text-color="white"
+                        size="small"
+                        class="role-selection-chip"
+                      >
+                        {{ item.title || item.value }}
+                      </v-chip>
+                    </template>
+                  </v-select>
+                </v-col>
+
+                <!-- First name -->
+                <v-col v-if="!userDialog.isEdit" cols="12" md="6">
+                  <v-text-field
+                    v-model="userDialog.user.firstName"
+                    :label="t('first_name')"
+                    variant="outlined"
+                    :rules="[requiredRule]"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                  >
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-card-account-details</v-icon
+                          >
+                        </template>
+                        <span>{{ t("first_name") }}</span>
+                      </v-tooltip>
+                    </template>
+                  </v-text-field>
+                </v-col>
+
+                <!-- Last name -->
+                <v-col v-if="!userDialog.isEdit" cols="12" md="6">
+                  <v-text-field
+                    v-model="userDialog.user.lastName"
+                    :label="t('last_name')"
+                    variant="outlined"
+                    :rules="[requiredRule]"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                  >
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-card-account-details-outline</v-icon
+                          >
+                        </template>
+                        <span>{{ t("last_name") }}</span>
+                      </v-tooltip>
+                    </template>
+                  </v-text-field>
+                </v-col>
+
+                <!-- Email -->
+                <v-col v-if="!userDialog.isEdit" cols="12" md="6">
+                  <v-text-field
+                    v-model="userDialog.user.email"
+                    :label="t('email')"
+                    variant="outlined"
+                    :rules="[requiredRule]"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                  >
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-email</v-icon
+                          >
+                        </template>
+                        <span>{{ t("email") }}</span>
+                      </v-tooltip>
+                    </template>
+                  </v-text-field>
+                </v-col>
+
+                <!-- Password field - only show when NOT in edit mode -->
+                <v-col v-if="!userDialog.isEdit" cols="12" md="6">
+                  <v-text-field
+                    v-model="userDialog.user.password"
+                    :label="t('password')"
+                    variant="outlined"
+                    :rules="[requiredRule]"
+                    type="password"
+                    density="comfortable"
+                    hide-details="auto"
+                    class="input-field "
+                  >
+                    <template v-slot:prepend>
+                      <v-tooltip location="top">
+                        <template v-slot:activator="{ props }">
+                          <v-icon
+                            v-bind="props"
+                            color="primary"
+                            class="field-icon"
+                            >mdi-lock</v-icon
+                          >
+                        </template>
+                        <span>{{ t("password") }}</span>
+                      </v-tooltip>
+                    </template>
+                    <template v-slot:append>
+                      <v-icon color="grey-darken-1">mdi-eye-off</v-icon>
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </div>
+
+            <!-- Current Organization Access Section -->
+            <div class="dialog-section current-org-section">
+              <div class="section-header">
+                <v-icon size="20" color="primary" class="me-2"
+                  >mdi-office-building</v-icon
+                >
+                <span class="text-h6">{{
+                  t("current_organization_access")
+                }}</span>
+              </div>
+
+              <div
+                class="org-access-container"
+                :class="{
+                  'empty-container':
+                    !userDialog.user.organizationAccess ||
+                    userDialog.user.organizationAccess.length === 0,
+                }"
+              >
+                <!-- Organization access cards -->
+                <div
+                  v-if="
+                    userDialog.user.organizationAccess &&
+                    userDialog.user.organizationAccess.length > 0
+                  "
+                  class="org-access-list"
+                >
+                  <v-slide-x-transition group>
+                    <v-card
+                      v-for="(org, idx) in userDialog.user.organizationAccess"
+                      :key="idx"
+                      class="org-access-card mb-2"
+                      variant="outlined"
+                      :color="getOrgColor(org.organizationId)"
+                    >
+                      <div class="d-flex align-center px-3 py-2">
+                        <v-avatar
+                          :color="getOrgColor(org.organizationId)"
+                          size="28"
+                          class="me-3"
+                        >
+                          <v-icon color="white" size="small">mdi-domain</v-icon>
+                        </v-avatar>
+
+                        <div class="flex-grow-1">
+                          <div class="d-flex align-center">
+                            <span class="text-subtitle-2 font-weight-bold me-2"
+                              >{{ org.nodeType }}:</span
+                            >
+                            <span class="text-body-2 text-truncate">{{
+                              getLastPathSegment(org.path)
+                            }}</span>
+                          </div>
+                          <div class="text-caption org-path-text text-truncate">
+                            {{ org.path }}
+                          </div>
+                        </div>
+
+                        <v-btn
+                          icon
+                          variant="text"
+                          size="small"
+                          color="grey-darken-1"
+                          @click="removeOrgAccess(idx)"
+                          class="remove-org-btn"
+                        >
+                          <v-icon size="18">mdi-close-circle</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-card>
+                  </v-slide-x-transition>
                 </div>
 
-                <!-- แสดงข้อความเมื่อไม่มีสิทธิ์การเข้าถึงองค์กร -->
+                <!-- Empty state for no organization access -->
                 <div
                   v-if="
                     !userDialog.user.organizationAccess ||
                     userDialog.user.organizationAccess.length === 0
                   "
-                  class="text-center pa-4 empty-access-message"
+                  class="empty-org-access"
                 >
-                  <v-icon size="48" color="grey-lighten-1" class="mb-2"
+                  <v-icon size="64" color="grey-lighten-1" class="mb-3"
                     >mdi-domain-off</v-icon
                   >
-                  <div class="text-subtitle-1 grey--text">
+                  <div class="text-subtitle-1 grey--text text--darken-1">
                     {{ t("no_organization_access") }}
                   </div>
+                  <div class="text-caption grey--text mt-2">
+                    {{
+                      t("add_organization_below") ||
+                      "ใช้ส่วนด้านล่างเพื่อเพิ่มสิทธิ์การเข้าถึงองค์กร"
+                    }}
+                  </div>
                 </div>
-              </v-col>
-            </v-row>
+              </div>
+            </div>
 
-            <v-divider class="my-4"></v-divider>
+            <!-- Add Organization Access Section -->
+            <div class="dialog-section add-org-section">
+              <div class="section-header">
+                <v-icon size="20" color="primary" class="me-2"
+                  >mdi-domain-plus</v-icon
+                >
+                <span class="text-h6">{{ t("add_organization_access") }}</span>
+              </div>
 
-            <!-- ส่วนเพิ่มสิทธิ์การเข้าถึงองค์กร -->
-            <v-row>
-              <v-col cols="12">
-                <div class="section-title mb-4">
-                  <v-icon size="small" color="primary" class="me-2"
-                    >mdi-domain-plus</v-icon
-                  >
-                  {{ t("add_organization_access") }}
-                </div>
-
-                <!-- คอมโพเนนต์สำหรับเลือกองค์กรตามลำดับชั้น -->
-                <v-card variant="outlined" class="pa-4 mb-4">
+              <v-card variant="outlined" class="org-selector-card">
+                <v-card-text class="pa-4">
                   <OrganizationHierarchySelect
                     v-model="selectedHierarchy"
                     :organization-hierarchy="organizationHierarchy"
                     context="dialog"
                     @hierarchy-change="onHierarchyChange"
+                    class="org-hierarchy-select"
                   />
 
                   <v-btn
+                    block
                     color="primary"
-                    class="mt-4"
+                    class="mt-6 add-access-btn"
                     :disabled="!isValidHierarchySelection"
                     @click="addOrgAccess"
-                    prepend-icon="mdi-plus-circle"
+                    elevation="2"
                   >
+                    <v-icon start>mdi-plus-circle</v-icon>
                     {{ t("add_access") }}
                   </v-btn>
-                </v-card>
-              </v-col>
-            </v-row>
+                </v-card-text>
+              </v-card>
+            </div>
           </v-form>
         </v-card-text>
 
         <v-divider></v-divider>
 
-        <v-card-actions class="pa-4 dialog-actions">
+        <v-card-actions class="dialog-actions px-6 py-4">
           <v-spacer></v-spacer>
           <v-btn
             color="error"
             variant="outlined"
             @click="userDialog.show = false"
             class="cancel-btn me-3"
-            prepend-icon="mdi-close-circle"
+            elevation="0"
           >
+            <v-icon start>mdi-close-circle</v-icon>
             {{ t("cancel_button") }}
           </v-btn>
           <v-btn
@@ -530,8 +666,9 @@
             :loading="userDialog.loading"
             @click="saveUser"
             class="save-btn"
-            prepend-icon="mdi-content-save"
+            elevation="3"
           >
+            <v-icon start>mdi-content-save</v-icon>
             {{ t("save_button") }}
           </v-btn>
         </v-card-actions>
@@ -617,7 +754,7 @@
           </div>
 
           <!-- คำอธิบายการตั้งค่า -->
-          <div class="mb-4 text-body-1">{{ t("available_menus") }}</div>
+          <div class=" text-body-1">{{ t("available_menus") }}</div>
 
           <!-- รายการเมนูที่เลือกได้ -->
           <v-card variant="outlined" class="menu-list-card">
@@ -702,106 +839,130 @@
 
     <!-- Menu Role Dialog -->
     <!-- ส่วนของ Role Edit Dialog -->
-<v-dialog v-model="roleEditDialog.show" max-width="500px" class="role-edit-dialog">
-  <v-card class="rounded-lg elevation-5">
-    <!-- ส่วนหัวของ Dialog -->
-    <v-card-title class="role-dialog-header py-4 px-4 rounded-t-lg">
-      <div class="d-flex align-center">
-        <v-icon size="24" color="white" class="me-3">mdi-shield-account</v-icon>
-        <span class="text-h6">
-          {{ t("edit_roles_for") }} {{ selectedUserForRoleEdit.username }}
-        </span>
-      </div>
-    </v-card-title>
-
-    <!-- ส่วนเนื้อหาของ Dialog -->
-    <v-card-text class="pt-6 pb-4 px-4">
-      <!-- ส่วนแสดงข้อมูลผู้ใช้ -->
-      <div class="user-role-info mb-6 pa-4 rounded-lg bg-grey-lighten-4">
-        <div class="d-flex align-center mb-3">
-          <v-avatar color="primary" class="me-3" size="40">
-            <span class="text-h6 white--text">
-              {{ selectedUserForRoleEdit.username ? selectedUserForRoleEdit.username.charAt(0).toUpperCase() : 'U' }}
-            </span>
-          </v-avatar>
-          <div>
-            <div class="text-subtitle-1 font-weight-bold">{{ selectedUserForRoleEdit.username }}</div>
-          </div>
-        </div>
-        
-        <!-- คำอธิบายในการตั้งค่าบทบาท -->
-        <div class="role-instruction text-body-2 mt-2">
-          <v-icon size="small" color="info" class="me-1">mdi-information-outline</v-icon>
-          {{ t("role_edit_instruction") || "เลือกบทบาทที่ต้องการกำหนดให้กับผู้ใช้งานนี้" }}
-        </div>
-      </div>
-
-      <!-- ส่วนเลือกบทบาท -->
-      <v-select
-        v-model="selectedUserForRoleEdit.currentRole"
-        :items="clientRoles"
-        :label="t('select_role')"
-        variant="outlined"
-        color="primary"
-        hide-details
-        class="role-select mb-3"
-        :menu-props="{ contentClass: 'role-select-menu' }"
-      >
-        <template v-slot:selection="{ item }">
+    <v-dialog
+      v-model="roleEditDialog.show"
+      max-width="500px"
+      class="role-edit-dialog"
+    >
+      <v-card class="rounded-lg elevation-5">
+        <!-- ส่วนหัวของ Dialog -->
+        <v-card-title class="role-dialog-header py-4 px-4 rounded-t-lg">
           <div class="d-flex align-center">
-            <v-icon :color="getClientColor(item.value)" size="small" class="me-2">
-              mdi-shield-account
-            </v-icon>
-            <span>{{ item.title || item.value }}</span>
+            <v-icon size="24" color="white" class="me-3"
+              >mdi-shield-account</v-icon
+            >
+            <span class="text-h6">
+              {{ t("edit_roles_for") }} {{ selectedUserForRoleEdit.username }}
+            </span>
           </div>
-        </template>
+        </v-card-title>
 
-        <template v-slot:item="{ item, props }">
-          <v-list-item
-            v-bind="props"
-            :title="item.title || item.value"
-            :prepend-icon="'mdi-shield-account'"
-            :prepend-icon-color="getClientColor(item.value)"
-          ></v-list-item>
-        </template>
-      </v-select>
+        <!-- ส่วนเนื้อหาของ Dialog -->
+        <v-card-text class="pt-6 pb-4 px-4">
+          <!-- ส่วนแสดงข้อมูลผู้ใช้ -->
+          <div class="user-role-info mb-6 pa-4 rounded-lg bg-grey-lighten-4">
+            <div class="d-flex align-center mb-3">
+              <v-avatar color="primary" class="me-3" size="40">
+                <span class="text-h6 white--text">
+                  {{
+                    selectedUserForRoleEdit.username
+                      ? selectedUserForRoleEdit.username.charAt(0).toUpperCase()
+                      : "U"
+                  }}
+                </span>
+              </v-avatar>
+              <div>
+                <div class="text-subtitle-1 font-weight-bold">
+                  {{ selectedUserForRoleEdit.username }}
+                </div>
+              </div>
+            </div>
 
-      <!-- ข้อมูลเพิ่มเติม -->
-      <div class="text-caption text-grey-darken-1 mt-4">
-        <v-icon size="small" color="warning" class="me-1">mdi-alert-circle-outline</v-icon>
-        {{ t("role_change_warning") || "การเปลี่ยนบทบาทอาจส่งผลต่อสิทธิ์การเข้าถึงระบบของผู้ใช้งาน" }}
-      </div>
-    </v-card-text>
+            <!-- คำอธิบายในการตั้งค่าบทบาท -->
+            <div class="role-instruction text-body-2 mt-2">
+              <v-icon size="small" color="info" class="me-1"
+                >mdi-information-outline</v-icon
+              >
+              {{
+                t("role_edit_instruction") ||
+                "เลือกบทบาทที่ต้องการกำหนดให้กับผู้ใช้งานนี้"
+              }}
+            </div>
+          </div>
 
-    <!-- ส่วนปุ่มดำเนินการ -->
-    <v-divider></v-divider>
+          <!-- ส่วนเลือกบทบาท -->
+          <v-select
+            v-model="selectedUserForRoleEdit.currentRole"
+            :items="clientRoles"
+            :label="t('select_role')"
+            variant="outlined"
+            color="primary"
+            hide-details
+            class="role-select mb-3"
+            :menu-props="{ contentClass: 'role-select-menu' }"
+          >
+            <template v-slot:selection="{ item }">
+              <div class="d-flex align-center">
+                <v-icon
+                  :color="getClientColor(item.value)"
+                  size="small"
+                  class="me-2"
+                >
+                  mdi-shield-account
+                </v-icon>
+                <span>{{ item.title || item.value }}</span>
+              </div>
+            </template>
 
-    <v-card-actions class="pa-4 bg-grey-lighten-4">
-      <v-spacer></v-spacer>
-      <v-btn
-        variant="outlined"
-        color="grey-darken-1"
-        @click="roleEditDialog.show = false"
-        class="me-3 role-cancel-btn"
-        prepend-icon="mdi-close-circle"
-      >
-        {{ t("cancel") }}
-      </v-btn>
-      <v-btn
-        variant="elevated"
-        color="primary"
-        @click="submitRoleUpdate"
-        class="role-save-btn"
-        :loading="roleEditDialog.loading"
-        prepend-icon="mdi-content-save"
-      >
-        {{ t("save") }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+            <template v-slot:item="{ item, props }">
+              <v-list-item
+                v-bind="props"
+                :title="item.title || item.value"
+                :prepend-icon="'mdi-shield-account'"
+                :prepend-icon-color="getClientColor(item.value)"
+              ></v-list-item>
+            </template>
+          </v-select>
 
+          <!-- ข้อมูลเพิ่มเติม -->
+          <div class="text-caption text-grey-darken-1 mt-4">
+            <v-icon size="small" color="warning" class="me-1"
+              >mdi-alert-circle-outline</v-icon
+            >
+            {{
+              t("role_change_warning") ||
+              "การเปลี่ยนบทบาทอาจส่งผลต่อสิทธิ์การเข้าถึงระบบของผู้ใช้งาน"
+            }}
+          </div>
+        </v-card-text>
 
+        <!-- ส่วนปุ่มดำเนินการ -->
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-4 bg-grey-lighten-4">
+          <v-spacer></v-spacer>
+          <v-btn
+            variant="outlined"
+            color="grey-darken-1"
+            @click="roleEditDialog.show = false"
+            class="me-3 role-cancel-btn"
+            prepend-icon="mdi-close-circle"
+          >
+            {{ t("cancel") }}
+          </v-btn>
+          <v-btn
+            variant="elevated"
+            color="primary"
+            @click="submitRoleUpdate"
+            class="role-save-btn"
+            :loading="roleEditDialog.loading"
+            prepend-icon="mdi-content-save"
+          >
+            {{ t("save") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -888,7 +1049,6 @@ const handleUpdateOptions = (options) => {
   fetchUsers();
 };
 
-
 const search = ref("");
 const searchQuery = ref("");
 const organizationFilter = ref(null);
@@ -910,7 +1070,7 @@ const headers = computed(() => [
     align: "center",
     width: "50px",
   },
-  { title: t("user_name"), key: "username", sortable: true, width: "120px" , },
+  { title: t("user_name"), key: "username", sortable: true, width: "120px" },
   { title: t("full_name"), key: "fullName", sortable: true, width: "180px" },
   //{ title: t('is_admin'), key: 'isAdmin', sortable: true, align: 'center', width: '80px' },
   {
@@ -942,8 +1102,6 @@ const headers = computed(() => [
     width: "120px",
   },
 ]);
-
-
 
 // Optional: Add a responsive mode that activates when the screen is too small
 const isMobile = ref(false);
@@ -1441,7 +1599,6 @@ const availableMenus = computed(() => [
   { label: t("settings"), value: MenuName.SETTINGS, icon: "mdi-cog-outline" },
 ]);
 
-
 // เพิ่มฟังก์ชันนี้ต่อจาก availableMenus computed
 const getMenuIconColor = (menuValue) => {
   // สีของไอคอนตามประเภทของเมนู
@@ -1458,7 +1615,6 @@ const getMenuIconColor = (menuValue) => {
 
   return colorMap[menuValue] || "primary";
 };
-
 
 // บันทึกสิทธิ์เมนู
 const saveMenuPermissions = async () => {
@@ -1486,7 +1642,7 @@ const roleEditDialog = ref({
   show: false,
   username: "",
   currentRoles: [],
-  loading: false
+  loading: false,
 });
 
 const selectedUserForRoleEdit = ref({
@@ -1645,7 +1801,7 @@ onBeforeUnmount(() => {
   padding: 14px 16px !important;
   text-transform: none !important;
   font-size: 14px !important;
-  text-align: center !important; 
+  text-align: center !important;
 }
 
 :deep(.data-table td) {
@@ -1682,7 +1838,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  justify-content: center; 
+  justify-content: center;
   width: 100%;
 }
 
@@ -1728,8 +1884,8 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 8px;
   justify-content: center;
-   text-align: center;
-   margin: 0 auto;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .action-button {
@@ -1777,88 +1933,244 @@ onBeforeUnmount(() => {
 }
 
 /* <!--------------------------------- User Edit/Add Dialog --------------------------> */
-/* สไตล์สำหรับไดอะล็อก */
+/* User Edit/Add Dialog Styles */
 .user-dialog :deep(.v-card) {
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
+  background-color: #f8f9fa;
 }
 
 .dialog-header {
-  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+  background: linear-gradient(120deg, #1a237e, #0d47a1);
   color: white;
-  padding: 16px 24px !important;
+  padding: 20px 24px !important;
   font-size: 1.2rem;
   font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.dialog-actions {
-  background-color: #f5f7fa;
+.dialog-header .close-btn {
+  transition: transform 0.2s ease;
 }
 
-.section-title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #37474f;
+.dialog-header .close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.dialog-section {
+  padding: 24px;
+  margin-bottom: 8px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f4f8;
   margin-bottom: 16px;
-  border-bottom: 1px solid #e0e0e0;
 }
 
-.input-field :deep(.v-field__field) {
-  min-height: 44px;
+.input-field {
+  margin-bottom: 16px;
 }
 
 .input-field :deep(.v-field) {
-  border-radius: 8px;
-  background-color: #ffffff;
+  border-radius: 12px;
+  background-color: #f8f9fa;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .input-field:hover :deep(.v-field) {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-field :deep(.v-field--focused) {
+  background-color: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border-color: #1976d2;
+}
+
+.field-icon {
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.input-field:hover .field-icon,
+.input-field :deep(.v-field--focused) + .field-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.role-selection-chip {
+  font-weight: 500;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+/* Organization Access Section */
+.org-access-container {
+  min-height: 100px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  scrollbar-width: thin;
+}
+
+.org-access-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.org-access-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.org-access-card {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  border-width: 2px;
+  border-left-width: 4px;
+  background-color: white;
+}
+
+.org-access-card:hover {
+  transform: translateX(3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.org-path-text {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.remove-org-btn {
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.remove-org-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  color: #f44336 !important;
+}
+
+.empty-org-access {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px dashed #e0e0e0;
+  height: 100%;
+}
+
+/* Add Organization Section */
+.org-selector-card {
+  border-radius: 12px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.org-selector-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.org-hierarchy-select :deep(.v-field) {
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  margin-bottom: 12px;
+}
+
+.add-access-btn {
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  transition: all 0.3s ease;
+  background: linear-gradient(120deg, #1565c0, #0d47a1);
+}
+
+.add-access-btn:not([disabled]):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+}
+
+.add-access-btn[disabled] {
+  background: linear-gradient(120deg, #90caf9, #64b5f6) !important;
+  opacity: 0.6;
+}
+
+/* Action Buttons */
+.dialog-actions {
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
 }
 
 .cancel-btn,
 .save-btn {
-  min-width: 120px;
-  height: 40px;
-  border-radius: 8px;
+  min-width: 140px;
+  height: 48px;
+  border-radius: 12px;
   text-transform: none;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   letter-spacing: 0.3px;
-}
-
-.save-btn {
-  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-}
-
-.save-btn:hover:not([disabled]) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-}
-
-.org-access-chip {
-  border-radius: 6px !important;
-  padding: 8px 12px;
-  height: auto !important;
   transition: all 0.2s ease;
 }
 
-.org-access-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.save-btn {
+  background: linear-gradient(120deg, #1976d2, #0d47a1);
+  box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
 }
 
-.empty-access-message {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 24px;
-  text-align: center;
-  border: 1px dashed #ccc;
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(25, 118, 210, 0.4);
+}
+
+.cancel-btn {
+  border: 2px solid;
+}
+
+.cancel-btn:hover {
+  transform: translateY(-2px);
+  background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .dialog-section {
+    padding: 16px;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    min-width: 120px;
+    height: 44px;
+  }
+
+  .org-access-container {
+    max-height: 200px;
+  }
 }
 
 /* <!--------------------------------- Menu Permission Dialog --------------------------> */
@@ -2017,7 +2329,8 @@ onBeforeUnmount(() => {
   border-left: 3px solid #2196f3;
 }
 
-.role-cancel-btn, .role-save-btn {
+.role-cancel-btn,
+.role-save-btn {
   border-radius: 8px;
   text-transform: none;
   font-weight: 500;

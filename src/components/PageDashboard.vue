@@ -1,7 +1,6 @@
-<!-- PageDashboard.vue -->
+<!-- PageDashboard.vue - ส่วนของ template ที่ปรับปรุง -->
 
 <template>
-
   <!-- Template with Fixed Fullscreen Functionality -->
   <v-container fluid class="dashboard-container pa-4">
     <!-- Header -->
@@ -14,44 +13,68 @@
       <!-- Left Column -->
       <v-col cols="12" md="6" class="pr-md-2">
         <!-- Total Organizations Card -->
-        <v-card color="red-darken-4" class="cursor-pointer mb-4" @click="$router.push('/main/Organization')">
-          <v-card-text class="d-flex flex-column align-center justify-center py-4"  style="color: black;">
-            <v-icon size="28" class="position-absolute top-left-icon">mdi-police-badge</v-icon>
-            <div class="text-h6 text-center">{{ t('dashboard.stats.totalOrganizations') }}</div>
+        <v-card
+          class="cursor-pointer mb-4 stat-card gradient-red"
+          @click="$router.push('/main/Organization')"
+        >
+          <v-card-text
+            class="d-flex flex-column align-center justify-center py-4"
+            style="color: white"
+          >
+            <v-icon size="32" class="card-icon">mdi-police-badge</v-icon>
+            <div class="text-h6 text-center">
+              {{ t("dashboard.stats.totalOrganizations") }}
+            </div>
             <div class="text-h3 mt-2">{{ totalData.totalOrganizations }}</div>
           </v-card-text>
         </v-card>
 
         <!-- Total Readers Card -->
-        <v-card color="blue-lighten-2" class="cursor-pointer mb-4" @click="$router.push('/main/RegisterReader')">
-          <v-card-text class="d-flex flex-column align-center justify-center py-4">
-            <v-icon size="28" class="position-absolute top-left-icon"> mdi-network-outline</v-icon>
-            <div class="text-h6 text-center">{{ t('dashboard.stats.totalReaders') }}</div>
+        <v-card
+          class="cursor-pointer mb-4 stat-card gradient-blue"
+          @click="$router.push('/main/RegisterReader')"
+        >
+          <v-card-text
+            class="d-flex flex-column align-center justify-center py-4"
+          >
+            <v-icon size="32" class="card-icon">mdi-network-outline</v-icon>
+            <div class="text-h6 text-center">
+              {{ t("dashboard.stats.totalReaders") }}
+            </div>
             <div class="text-h3 mt-2">{{ totalData.totalReaders }}</div>
           </v-card-text>
         </v-card>
 
         <!-- Reader Status Cards -->
         <v-row class="mb-4">
-
           <!--STATUS CARD -->
           <v-col cols="4" class="pr-1">
             <v-card
-                color="grey-lighten-1"
-                :class="['rounded-0', shouldBlink ? 'blinking' : '']"
+              color="grey-lighten-1"
+              :class="['rounded-0', shouldBlink ? 'blinking' : '']"
             >
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('status') }}</div>
-                <div class="text-h4 mt-1">{{t('rfid_gateway')}}</div>
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">{{ t("status") }}</div>
+                <div class="text-h6 mt-1">{{ t("rfid_gateway") }}</div>
               </v-card-text>
             </v-card>
           </v-col>
 
           <!-- Reader Online Card -->
           <v-col cols="4" class="pr-1">
-            <v-card color="green-lighten-2" class="cursor-pointer" @click="showDetailDialog('readerOnline')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('dashboard.stats.readerOnline') }}</div>
+            <v-card
+              class="stat-card gradient-green"
+              @click="navigateToReaderWithStatus('ONLINE')"
+              style="cursor: pointer"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">
+                  {{ t("dashboard.stats.readerOnline") }}
+                </div>
                 <div class="text-h4 mt-1">{{ readerStatus.readerOnline }}</div>
               </v-card-text>
             </v-card>
@@ -59,85 +82,132 @@
 
           <!-- Reader Offline Card -->
           <v-col cols="4" class="pl-1">
-            <v-card color="lime-lighten-4" class="cursor-pointer" @click="showDetailDialog('readerOffline')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('dashboard.stats.readerOffline') }}</div>
+            <v-card
+              class="stat-card gradient-yellow"
+              @click="navigateToReaderWithStatus('OFFLINE')"
+              style="cursor: pointer"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">
+                  {{ t("dashboard.stats.readerOffline") }}
+                </div>
                 <div class="text-h4 mt-1">{{ readerStatus.readerOffline }}</div>
               </v-card-text>
             </v-card>
           </v-col>
-
         </v-row>
 
         <!-- Gateway Location Map -->
         <v-card
-            :height="isLocationMapFullscreen ? 'calc(100vh - 200px)' : '300'"
-            color="grey-lighten-3"
-            class="mb-2"
-            :class="{ 'fullscreen-card': isLocationMapFullscreen }"
+          :height="isLocationMapFullscreen ? 'calc(100vh - 200px)' : '300'"
+          class="mb-2"
+          :class="{ 'fullscreen-card': isLocationMapFullscreen }"
         >
           <v-card-title class="d-flex align-center justify-space-between">
-            <span>{{ t('gateway_location_map') }}</span>
+            <span>{{ t("gateway_location_map") }}</span>
             <div class="d-flex align-center">
-              <span class="text-caption me-2" v-if="readerMapOrgName">{{ translatedReaderMapOrgName }}</span>
+              <span class="text-caption me-2" v-if="readerMapOrgName">{{
+                translatedReaderMapOrgName
+              }}</span>
               <v-btn icon size="small" @click="toggleLocationMapFullscreen">
-                <v-icon>{{ isLocationMapFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
+                <v-icon>{{
+                  isLocationMapFullscreen
+                    ? "mdi-fullscreen-exit"
+                    : "mdi-fullscreen"
+                }}</v-icon>
               </v-btn>
             </div>
           </v-card-title>
-          <v-card-text :style="{ height: isLocationMapFullscreen ? 'calc(100% - 64px)' : '240px' }" class="pa-0 position-relative">
-            <v-btn icon variant="text" @click="cycleToPreviousReaderMap" class="position-absolute map-navigation-btn"
-                   style="left: 10px; top: 50%; transform: translateY(-50%);">
+          <v-card-text
+            :style="{
+              height: isLocationMapFullscreen ? 'calc(100% - 64px)' : '240px',
+            }"
+            class="pa-0 position-relative"
+          >
+            <v-btn
+              icon
+              variant="text"
+              @click="cycleToPreviousReaderMap"
+              class="position-absolute map-navigation-btn"
+              style="left: 10px; top: 50%; transform: translateY(-50%)"
+            >
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
-            <v-btn icon variant="text" @click="cycleToNextReaderMap" class="position-absolute map-navigation-btn"
-                   style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <v-btn
+              icon
+              variant="text"
+              @click="cycleToNextReaderMap"
+              class="position-absolute map-navigation-btn"
+              style="right: 10px; top: 50%; transform: translateY(-50%)"
+            >
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
 
             <!-- Map Display -->
             <template v-if="readerMapUrl">
               <div class="map-container" id="reader-map-container">
-                <img :src="readerMapUrl" class="organization-map" :class="{ 'fullscreen': isLocationMapFullscreen }" alt="Reader Map" style="opacity: 0.4;" @click="handleReaderImageClick" @load="onMapImageLoad"/>
+                <img
+                  :src="readerMapUrl"
+                  class="organization-map"
+                  :class="{ fullscreen: isLocationMapFullscreen }"
+                  alt="Reader Map"
+                  @click="handleReaderImageClick"
+                  @load="onMapImageLoad"
+                />
 
                 <!-- Reader Coordinates Loading -->
-                <div v-if="sectionStates.readerCoordinates.loading" class="reader-loading">
-                  <v-progress-circular size="24" indeterminate></v-progress-circular>
+                <div
+                  v-if="sectionStates.readerCoordinates.loading"
+                  class="reader-loading"
+                >
+                  <v-progress-circular
+                    size="24"
+                    indeterminate
+                  ></v-progress-circular>
                 </div>
 
                 <!-- Reader Coordinates Error -->
-                <div v-else-if="sectionStates.readerCoordinates.error" class="reader-error">
+                <div
+                  v-else-if="sectionStates.readerCoordinates.error"
+                  class="reader-error"
+                >
                   <v-icon color="error" size="small">mdi-alert</v-icon>
                 </div>
 
                 <!-- Multiple Reader Markers -->
-                <template v-if="readerCoordinates.length > 0 && !isHeatMapFullscreen">
-                  <div v-for="reader in readerCoordinates" :key="reader.id" class="reader-marker" :style="getReaderMarkerStyle(reader)" :title="getReaderTooltip(reader)">
-                    <v-icon :color="getReaderColor(reader.status)" size="32" :class="'status-' + reader.status.toLowerCase()">
+                <template
+                  v-if="readerCoordinates.length > 0 && !isHeatMapFullscreen"
+                >
+                  <div
+                    v-for="reader in readerCoordinates"
+                    :key="reader.id"
+                    class="reader-marker"
+                    :style="getReaderMarkerStyle(reader)"
+                    :title="getReaderTooltip(reader)"
+                  >
+                    <v-icon
+                      :color="getReaderColor(reader.status)"
+                      size="32"
+                      :class="'status-' + reader.status.toLowerCase()"
+                    >
                       {{ getReaderIcon(reader.role) }}
                     </v-icon>
                   </div>
                 </template>
-
-                <!-- Reader Summary Marker at Top-Left -->
-                <div
-                    class="reader-summary-marker"
-                    @click="showAllReadersByOrg(rootOrganizations[currentReaderMapIndex].id)"
-                >
-                  <v-chip color="deep-purple-accent-2" size="small" class="elevation-3">
-                    <v-icon start size="18">mdi-network-outline</v-icon>
-                    {{ readerCoordinates.length }} Readers
-                  </v-chip>
-                </div>
-
               </div>
             </template>
 
             <!-- No Map State -->
             <template v-else>
-              <div class="d-flex flex-column align-center justify-center h-100">
-                <v-icon size="32" color="grey">mdi-map-outline</v-icon>
-                <div class="text-grey text-center mt-2">{{ t('no_map_available') }}</div>
+              <div
+                class="d-flex flex-column align-center justify-center h-100 empty-state-container"
+              >
+                <v-icon size="48" color="grey">mdi-map-outline</v-icon>
+                <div class="text-h6 text-grey-darken-1 mt-2">
+                  {{ t("no_map_available") }}
+                </div>
               </div>
             </template>
           </v-card-text>
@@ -145,95 +215,118 @@
 
         <!-- RFID Tag Heat Map -->
         <v-card
-            :height="isHeatMapFullscreen ? 'calc(100vh - 200px)' : '300'"
-            color="grey-lighten-3"
-            :class="{ 'fullscreen-card': isHeatMapFullscreen }"
+          :height="isHeatMapFullscreen ? 'calc(100vh - 200px)' : '300'"
+          :class="{ 'fullscreen-card': isHeatMapFullscreen }"
         >
           <v-card-title class="d-flex align-center justify-space-between">
-            <span>{{ t('rfid_heat_map') }}</span>
+            <span>{{ t("rfid_heat_map") }}</span>
             <div class="d-flex align-center">
-              <span class="text-caption me-2" v-if="heatMapOrgName">{{ translatedHeatMapOrgName }}</span>
+              <span class="text-caption me-2" v-if="heatMapOrgName">{{
+                translatedHeatMapOrgName
+              }}</span>
               <v-btn icon size="small" @click="toggleHeatMapFullscreen">
-                <v-icon>{{ isHeatMapFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
+                <v-icon>{{
+                  isHeatMapFullscreen ? "mdi-fullscreen-exit" : "mdi-fullscreen"
+                }}</v-icon>
               </v-btn>
             </div>
           </v-card-title>
-          <v-card-text :style="{ height: isHeatMapFullscreen ? 'calc(100% - 64px)' : '240px' }" class="pa-0 position-relative">
-            <v-btn icon variant="text" @click="cycleToPreviousHeatMap" class="position-absolute map-navigation-btn"
-                   style="left: 10px; top: 50%; transform: translateY(-50%);">
+          <v-card-text
+            :style="{
+              height: isHeatMapFullscreen ? 'calc(100% - 64px)' : '240px',
+            }"
+            class="pa-0 position-relative"
+          >
+            <v-btn
+              icon
+              variant="text"
+              @click="cycleToPreviousHeatMap"
+              class="position-absolute map-navigation-btn"
+              style="left: 10px; top: 50%; transform: translateY(-50%)"
+            >
               <v-icon>mdi-chevron-left</v-icon>
             </v-btn>
-            <v-btn icon variant="text" @click="cycleToNextHeatMap" class="position-absolute map-navigation-btn"
-                   style="right: 10px; top: 50%; transform: translateY(-50%);">
+            <v-btn
+              icon
+              variant="text"
+              @click="cycleToNextHeatMap"
+              class="position-absolute map-navigation-btn"
+              style="right: 10px; top: 50%; transform: translateY(-50%)"
+            >
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
 
             <!-- Map Display -->
             <template v-if="heatMapUrl">
               <div class="map-container" id="rfid-map-container">
-                <img :src="heatMapUrl" class="organization-map" :class="{ 'fullscreen': isHeatMapFullscreen }" alt="Heat Map" style="opacity: 0.4;" @load="onHeatmapImageLoad"/>
+                <img
+                  :src="heatMapUrl"
+                  class="organization-map"
+                  :class="{ fullscreen: isHeatMapFullscreen }"
+                  alt="Heat Map"
+                  @load="onHeatmapImageLoad"
+                />
 
                 <!-- RFID Tag Coordinates Loading -->
-                <div v-if="sectionStates.rfidTagCoordinates.loading" class="tag-loading">
-                  <v-progress-circular size="24" indeterminate></v-progress-circular>
+                <div
+                  v-if="sectionStates.rfidTagCoordinates.loading"
+                  class="tag-loading"
+                >
+                  <v-progress-circular
+                    size="24"
+                    indeterminate
+                  ></v-progress-circular>
                 </div>
 
                 <!-- RFID Tag Coordinates Error -->
-                <div v-else-if="sectionStates.rfidTagCoordinates.error" class="tag-error">
+                <div
+                  v-else-if="sectionStates.rfidTagCoordinates.error"
+                  class="tag-error"
+                >
                   <v-icon color="error" size="small">mdi-alert</v-icon>
                 </div>
 
                 <!-- Styled Tag Markers with Click to Show Details -->
-                <div v-if="rfidTagsCoordinates && rfidTagsCoordinates.length > 0 && !isLocationMapFullscreen" class="rfid-test-container">
-                  <div v-for="cluster in rfidTagsCoordinates"
-                       :key="cluster.readerSerialNumber"
-                       class="tag-cluster"
-                       :style="getTagMarkerStyle(cluster)"
-                       @click="showClusterDetails(cluster)"
-                       @mouseenter="handleClusterHover(cluster)"
-                       :title="hoveredCluster === cluster ? getClusterTooltip(cluster) : ''"
+                <div
+                  v-if="
+                    rfidTagsCoordinates &&
+                    rfidTagsCoordinates.length > 0 &&
+                    !isLocationMapFullscreen
+                  "
+                  class="rfid-test-container"
+                >
+                  <div
+                    v-for="cluster in rfidTagsCoordinates"
+                    :key="cluster.readerSerialNumber"
+                    class="tag-cluster"
+                    :style="getTagMarkerStyle(cluster)"
+                    @click="showClusterDetails(cluster)"
+                    @mouseenter="handleClusterHover(cluster)"
+                    :title="
+                      hoveredCluster === cluster
+                        ? getClusterTooltip(cluster)
+                        : ''
+                    "
                   >
-                    <div class="cluster-marker"
-                         :style="{
-                      backgroundColor: getClusterColor(cluster.tagCount || cluster.tags?.length || 0),
-                      width: `${getClusterSize(cluster.tagCount || cluster.tags?.length || 0)}px`,
-                      height: `${getClusterSize(cluster.tagCount || cluster.tags?.length || 0)}px`
+                    <div
+                      class="cluster-marker"
+                      :style="{
+                        backgroundColor: getClusterColor(
+                          cluster.tagCount || cluster.tags?.length || 0
+                        ),
+                        width: `${getClusterSize(
+                          cluster.tagCount || cluster.tags?.length || 0
+                        )}px`,
+                        height: `${getClusterSize(
+                          cluster.tagCount || cluster.tags?.length || 0
+                        )}px`,
                       }"
-                         @click.stop.prevent="showClusterDetails(cluster)">
+                      @click.stop.prevent="showClusterDetails(cluster)"
+                    >
                       <span class="cluster-count">
                         {{ cluster.tagCount || cluster.tags?.length || 0 }}
                       </span>
                     </div>
-                  </div>
-
-                  <!-- ADD THIS: Map Legend -->
-                  <div class="map-legend" v-if="isHeatMapFullscreen && rfidTagsCoordinates.length > 0">
-                    <div class="legend-title">{{ t('tag_count') || 'Tag Count' }}</div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background-color: #42A5F5;"></div>
-                      <div class="legend-label">1-20</div>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background-color: #4CAF50;"></div>
-                      <div class="legend-label">21-50</div>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background-color: #FF9800;"></div>
-                      <div class="legend-label">51-100</div>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background-color: #F44336;"></div>
-                      <div class="legend-label">100+</div>
-                    </div>
-                  </div>
-
-                  <!-- ADD THIS: Tag Count Badge -->
-                  <div class="tag-count-badge">
-                    <v-chip color="primary" size="small">
-                      <v-icon start size="18">mdi-barcode</v-icon>
-                      {{ rfidTagsCoordinates.reduce((sum, cluster) => sum + (cluster.tagCount || (cluster.tags?.length || 0)), 0) }}
-                      {{ t('rfid_tags') || 'RFID Tags' }}
-                    </v-chip>
                   </div>
                 </div>
               </div>
@@ -241,43 +334,67 @@
 
             <!-- No Map State -->
             <template v-else>
-              <div class="d-flex flex-column align-center justify-center h-100">
-                <v-icon size="32" color="grey">mdi-map-outline</v-icon>
-                <div class="text-grey text-center mt-2">{{ t('no_map_available') }}</div>
+              <div
+                class="d-flex flex-column align-center justify-center h-100 empty-state-container"
+              >
+                <v-icon size="48" color="grey">mdi-map-outline</v-icon>
+                <div class="text-h6 text-grey-darken-1 mt-2">
+                  {{ t("no_map_available") }}
+                </div>
               </div>
             </template>
           </v-card-text>
         </v-card>
-
       </v-col>
 
       <!-- Right Column -->
       <v-col cols="12" md="6" class="pl-md-2">
         <!-- Total Supplies Card -->
-        <v-card color="amber-darken-3" class="cursor-pointer mb-4" @click="$router.push('/main/ManageSupplies')">
-          <v-card-text class="d-flex flex-column align-center justify-center py-4">
-            <v-icon size="28" class="position-absolute top-left-icon">mdi-pistol</v-icon>
-            <div class="text-h6 text-center">{{ t('dashboard.stats.totalSupplies') }}</div>
+        <v-card
+          class="cursor-pointer mb-4 stat-card gradient-orange"
+          @click="$router.push('/main/ManageSupplies')"
+        >
+          <v-card-text
+            class="d-flex flex-column align-center justify-center py-4"
+          >
+            <v-icon size="32" class="card-icon">mdi-pistol</v-icon>
+            <div class="text-h6 text-center">
+              {{ t("dashboard.stats.totalSupplies") }}
+            </div>
             <div class="text-h3 mt-2">{{ totalData.totalSupplies }}</div>
           </v-card-text>
         </v-card>
 
         <!-- Total RFID Tags Card -->
-        <v-card color="blue-lighten-4" class="cursor-pointer mb-4" @click="$router.push('/main/RegisterRfidTags')">
-          <v-card-text class="d-flex flex-column align-center justify-center py-4">
-            <v-icon size="28" class="position-absolute top-left-icon">mdi-barcode</v-icon>
-            <div class="text-h6 text-center">{{ t('dashboard.stats.totalRfidTags') }}</div>
+        <v-card
+          class="cursor-pointer mb-4 stat-card gradient-teal"
+          @click="$router.push('/main/RegisterRfidTags')"
+        >
+          <v-card-text
+            class="d-flex flex-column align-center justify-center py-4"
+          >
+            <v-icon size="32" class="card-icon">mdi-barcode</v-icon>
+            <div class="text-h6 text-center">
+              {{ t("dashboard.stats.totalRfidTags") }}
+            </div>
             <div class="text-h3 mt-2">{{ totalData.totalRfidTags }}</div>
           </v-card-text>
         </v-card>
 
         <!-- RFID Status Cards (Top Row) -->
-
         <v-row class="mb-3">
           <v-col cols="4" class="pr-1">
-            <v-card color="green-lighten-2" class="cursor-pointer" @click="showDetailDialog('tagInUsing')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('dashboard_10_using') }}</div>
+            <v-card
+              class="stat-card gradient-green"
+              @click="navigateToRfidWithStatus('USING')"
+              style="cursor: pointer"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">
+                  {{ t("dashboard_10_using") }}
+                </div>
                 <div class="text-h4 mt-1">{{ tagStats2[0]?.value ?? 0 }}</div>
               </v-card-text>
             </v-card>
@@ -285,9 +402,17 @@
 
           <!-- RFID พร้อมใช้งาน (Ready Tags) -->
           <v-col cols="4" class="pr-1">
-            <v-card color="light-blue-lighten-4" class="cursor-pointer" @click="showDetailDialog('tagInRemaining')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('dashboard_10_remain') }}</div>
+            <v-card
+              class="stat-card gradient-blue"
+              @click="navigateToRfidWithStatus('READY')"
+              style="cursor: pointer"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">
+                  {{ t("dashboard_10_remain") }}
+                </div>
                 <div class="text-h4 mt-1">{{ tagStats2[1]?.value ?? 0 }}</div>
               </v-card-text>
             </v-card>
@@ -295,58 +420,88 @@
 
           <!-- RFID คงเหลือ (Remained Tags) -->
           <v-col cols="4" class="pl-1">
-            <v-card color="brown-lighten-3" class="cursor-pointer" @click="showDetailDialog('tagDamaged')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-3">
-                <div class="text-subtitle-1 text-center">{{ t('dashboard_10_damaged') }}</div>
+            <v-card
+              class="stat-card gradient-purple"
+              @click="navigateToRfidWithStatus('DAMAGED')"
+              style="cursor: pointer"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-1 text-center">
+                  {{ t("dashboard_10_damaged") }}
+                </div>
                 <div class="text-h4 mt-1">{{ tagStats2[2]?.value ?? 0 }}</div>
               </v-card-text>
             </v-card>
           </v-col>
-
         </v-row>
 
         <!-- RFID Tag Small Status Cards (Bottom Row) -->
         <v-row class="mb-4">
-
-          <!-- STATUS CARD -->
-          <v-col cols="3" class="pr-1">
+          <!-- สถานะแท็ก RFID -->
+          <v-col cols="3">
             <v-card
-                color="grey-lighten-1"
-                    :class="['rounded-0', shouldBlink ? 'blinking' : '']">
-              <v-card-text class="d-flex flex-column align-center justify-center py-2">
-                <div class="text-subtitle-2 text-center">{{ t('status') }}</div>
-                <div class="text-h5 mt-1">{{ t('rfid_tag') }}</div>
+              color="grey-lighten-1"
+              :class="[
+                'rounded-0',
+                shouldBlink ? 'blinking' : '',
+                'rfid-status-card',
+              ]"
+            >
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-2 text-center">{{ t("status") }}</div>
+                <div class="text-h5 mt-1">{{ t("rfid_tag") }}</div>
               </v-card-text>
             </v-card>
           </v-col>
 
-
-          <!-- Supply Active -->
-          <v-col cols="3" class="pr-1">
-            <v-card color="green-lighten-2" class="cursor-pointer" @click="showDetailDialog('activeSupplies')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-2">
-                <div class="text-subtitle-2 text-center">{{ t('dashboard.stats.trackingActive') }}</div>
-                <div class="text-h5 mt-1">{{ suppliesStats[0]?.value ?? 0 }}</div>
+          <!-- RFID Tags ที่ส่งสัญญาณ -->
+          <v-col cols="3">
+            <v-card class="stat-card gradient-green rfid-status-card">
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-2 text-center">
+                  {{ t("dashboard.stats.trackingActive") }}
+                </div>
+                <div class="text-h5 mt-1">
+                  {{ suppliesStats[0]?.value ?? 0 }}
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
 
-          <!-- Supply Inactive -->
-          <v-col cols="3" class="px-1">
-            <v-card color="lime-lighten-4" class="cursor-pointer" @click="showDetailDialog('inactiveSupplies')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-2">
-                <div class="text-subtitle-2 text-center">{{ t('dashboard.stats.trackingInactive') }}</div>
-                <div class="text-h5 mt-1">{{ suppliesStats[1]?.value ?? 0 }}</div>
+          <!-- RFID Tags ที่ไม่ส่งสัญญาณ -->
+          <v-col cols="3">
+            <v-card class="stat-card gradient-yellow rfid-status-card">
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-2 text-center">
+                  {{ t("dashboard.stats.trackingInactive") }}
+                </div>
+                <div class="text-h5 mt-1">
+                  {{ suppliesStats[1]?.value ?? 0 }}
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
 
-          <!-- Supply Lost -->
-          <v-col cols="3" class="pl-1">
-            <v-card color="red-lighten-3" class="cursor-pointer" @click="showDetailDialog('lostSupplies')">
-              <v-card-text class="d-flex flex-column align-center justify-center py-2">
-                <div class="text-subtitle-2 text-center">{{ t('dashboard.stats.trackingLost') }}</div>
-                <div class="text-h5 mt-1">{{ suppliesStats[2]?.value ?? 0 }}</div>
+          <!-- RFID ที่สูญหาย -->
+          <v-col cols="3">
+            <v-card class="stat-card gradient-red rfid-status-card">
+              <v-card-text
+                class="d-flex flex-column align-center justify-center py-3"
+              >
+                <div class="text-subtitle-2 text-center">
+                  {{ t("dashboard.stats.trackingLost") }}
+                </div>
+                <div class="text-h5 mt-1">
+                  {{ suppliesStats[2]?.value ?? 0 }}
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -355,29 +510,49 @@
         <!-- Supply Types Chart -->
         <div :class="{ 'chart-fullscreen-container': isPieChartFullscreen }">
           <v-card
-              :height="isPieChartFullscreen ? 'calc(50vh - 100px)' : '500px'"
-              :width="isPieChartFullscreen ? 'calc(70vw)' : 'auto'"
-              color="grey-lighten-3"
-              :class="{ 'fullscreen-card-chart': isPieChartFullscreen }"
+            :height="isPieChartFullscreen ? 'calc(50vh - 100px)' : '500px'"
+            :width="isPieChartFullscreen ? 'calc(70vw)' : 'auto'"
+            :class="{ 'fullscreen-card-chart': isPieChartFullscreen }"
           >
             <v-card-title class="d-flex align-center justify-space-between">
-              <span>{{ t('dashboard.charts.supplyTypes') }}</span>
+              <span>{{ t("dashboard.charts.supplyTypes") }}</span>
               <v-btn icon size="small" @click="togglePieChartFullscreen">
-                <v-icon>{{ isPieChartFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
+                <v-icon>{{
+                  isPieChartFullscreen
+                    ? "mdi-fullscreen-exit"
+                    : "mdi-fullscreen"
+                }}</v-icon>
               </v-btn>
             </v-card-title>
-            <v-card-text :style="{ height: isPieChartFullscreen ? 'calc(100% - 64px)' : 'calc(500px - 64px)' }" class="d-flex justify-center align-center">
+            <v-card-text
+              :style="{
+                height: isPieChartFullscreen
+                  ? 'calc(100% - 64px)'
+                  : 'calc(500px - 64px)',
+              }"
+              class="d-flex justify-center align-center"
+            >
               <template v-if="sectionStates.supplyTypes.loading">
                 <v-progress-circular indeterminate></v-progress-circular>
               </template>
               <template v-else-if="supplyTypeData.length">
-                <PieChart :chartData="computedChartData" :isFullscreen="isPieChartFullscreen" class="w-100 h-100"/>
+                <PieChart
+                  :chartData="computedChartData"
+                  :isFullscreen="isPieChartFullscreen"
+                  class="w-100 h-100"
+                />
               </template>
               <template v-else>
                 <div class="empty-state-container">
-                  <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-chart-pie</v-icon>
-                  <div class="text-h6 text-grey-darken-1">{{ t('dashboard.charts.noDataTitle') }}</div>
-                  <div class="text-body-2 text-grey">{{ t('dashboard.charts.noDataMessage') }}</div>
+                  <v-icon size="64" color="grey-lighten-1" class="mb-4"
+                    >mdi-chart-pie</v-icon
+                  >
+                  <div class="text-h6 text-grey-darken-1">
+                    {{ t("dashboard.charts.noDataTitle") }}
+                  </div>
+                  <div class="text-body-2 text-grey">
+                    {{ t("dashboard.charts.noDataMessage") }}
+                  </div>
                 </div>
               </template>
             </v-card-text>
@@ -387,64 +562,140 @@
     </v-row>
 
     <!-- Copy/PNG Button -->
-    <div class="d-flex mb-4">
-      <span class="text-subtitle-2" style="color:#FF8C00;">COPY</span>
-      <v-btn variant="outlined" color="#FF8C00" size="small" class="ml-2" @click="exportReport('PNG')">PNG</v-btn>
+    <div class="d-flex mb-4 align-center">
+      <span class="export-label me-2">{{ t("export_report") || "COPY" }}</span>
+      <v-btn
+        variant="outlined"
+        class="export-button"
+        size="small"
+        @click="exportReport('PNG')"
+        >PNG</v-btn
+      >
     </div>
 
     <!-- Details Panel Dialog -->
     <v-dialog v-model="showDebugDetails" max-width="900">
       <v-card v-if="selectedCluster">
         <v-card-title class="d-flex justify-space-between align-center">
-          {{ selectedCluster.tagCount || selectedCluster.tags?.length || 0 }} Tags
-          <v-btn icon="mdi-close" size="small" @click="showDebugDetails = false"></v-btn>
-        </v-card-title>
-        <v-card-text style="max-height: 800px; overflow-y: auto;">
-          <!-- Dialog content unchanged -->
-          <!-- Reader / Cluster Information -->
-          <div class="text-h6">{{ t('reader_serial_number') || 'Reader Serial Number' }}: {{ selectedCluster.readerSerialNumber }}
+          <div class="d-flex align-center">
+            <v-icon class="me-2" color="primary">mdi-tag-multiple</v-icon>
             <span
+              >{{
+                selectedCluster.tagCount || selectedCluster.tags?.length || 0
+              }}
+              Tags</span
+            >
+          </div>
+          <v-btn
+            icon="mdi-close"
+            size="small"
+            @click="showDebugDetails = false"
+          ></v-btn>
+        </v-card-title>
+        <v-card-text style="max-height: 80vh; overflow-y: auto">
+          <!-- Reader / Cluster Information -->
+          <div class="d-flex align-center mb-3">
+            <v-icon class="me-2" color="primary">mdi-barcode-scan</v-icon>
+            <div class="text-h6">
+              {{ t("reader_serial_number") || "Reader Serial Number" }}:
+              <span class="text-primary font-weight-bold">{{
+                selectedCluster.readerSerialNumber
+              }}</span>
+              <span
                 v-if="selectedCluster.note"
                 class="text-primary font-weight-medium ms-2"
-            > - {{ selectedCluster.note }}</span>
+              >
+                - {{ selectedCluster.note }}</span
+              >
+            </div>
           </div>
 
-          <v-divider class="my-2"></v-divider>
+          <v-divider class="my-3"></v-divider>
+
           <!-- Search Bar -->
-          <v-text-field v-model="searchTag" :label="t('search') || 'Search'" density="compact" variant="outlined" hide-details class="mb-2 custom-table"></v-text-field>
+          <v-text-field
+            v-model="searchTag"
+            :label="t('search') || 'Search'"
+            density="compact"
+            variant="outlined"
+            hide-details
+            class="mb-3"
+            prepend-inner-icon="mdi-magnify"
+            clearable
+          ></v-text-field>
+
           <!-- Tag List with Vuetify 3 Data Table -->
           <v-data-table
-              :headers="tagHeaders"
-              :items="filteredTags"
-              :items-per-page="itemsPerPage"
-              :page="page"
-              @update:page="page = $event"
-              class="mt-2">
+            :headers="tagHeaders"
+            :items="filteredTags"
+            :items-per-page="itemsPerPage"
+            :page="page"
+            @update:page="page = $event"
+            class="mt-3"
+          >
             <!-- Custom template for status column to use the color function -->
             <template v-slot:item.trackingStatus="{ item }">
-              <v-chip :color="getTrackingStatusColor(item.trackingStatus)" size="small">{{ item.trackingStatus }}</v-chip>
+              <v-chip
+                :color="getTrackingStatusColor(item.trackingStatus)"
+                size="small"
+                >{{ item.trackingStatus }}</v-chip
+              >
             </template>
+
             <!-- Footer template for items-per-page selector -->
             <template v-slot:bottom>
               <div class="d-flex align-center justify-space-between px-4 py-2">
                 <span>Items per page:</span>
                 <v-select
-                    v-model="itemsPerPage"
-                    :items="[1, 3, 5, 10, 25, 50, 100, { value: -1, title: 'All' }]"
-                    density="compact"
-                    hide-details
-                    variant="outlined"
-                    style="min-width: 100px; width: 100px; max-width: 150px;"
-                    class="mx-2"
+                  v-model="itemsPerPage"
+                  :items="[
+                    1,
+                    3,
+                    5,
+                    10,
+                    25,
+                    50,
+                    100,
+                    { value: -1, title: 'All' },
+                  ]"
+                  density="compact"
+                  hide-details
+                  variant="outlined"
+                  style="min-width: 100px; width: 100px; max-width: 150px"
+                  class="mx-2"
                 ></v-select>
 
                 <div class="d-flex align-center">
                   <span class="me-4">{{ getPaginationText() }}</span>
                   <div class="d-flex">
-                    <v-btn icon="mdi-page-first" variant="text" density="compact" :disabled="page <= 1" @click="page = 1"></v-btn>
-                    <v-btn icon="mdi-chevron-left" variant="text" density="compact" :disabled="page <= 1" @click="page--"></v-btn>
-                    <v-btn icon="mdi-chevron-right" variant="text" density="compact" :disabled="page >= pageCount" @click="page++"></v-btn>
-                    <v-btn icon="mdi-page-last" variant="text" density="compact" :disabled="page >= pageCount" @click="page = pageCount"></v-btn>
+                    <v-btn
+                      icon="mdi-page-first"
+                      variant="text"
+                      density="compact"
+                      :disabled="page <= 1"
+                      @click="page = 1"
+                    ></v-btn>
+                    <v-btn
+                      icon="mdi-chevron-left"
+                      variant="text"
+                      density="compact"
+                      :disabled="page <= 1"
+                      @click="page--"
+                    ></v-btn>
+                    <v-btn
+                      icon="mdi-chevron-right"
+                      variant="text"
+                      density="compact"
+                      :disabled="page >= pageCount"
+                      @click="page++"
+                    ></v-btn>
+                    <v-btn
+                      icon="mdi-page-last"
+                      variant="text"
+                      density="compact"
+                      :disabled="page >= pageCount"
+                      @click="page = pageCount"
+                    ></v-btn>
                   </div>
                 </div>
               </div>
@@ -453,47 +704,28 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-
-
-    <DashboardDialog
-        v-model="dialogVisible"
-        :type="dialogType"
-        :rootOrgId="readerMapRootOrgId"
-    />
-
   </v-container>
-
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import HeaderCommon from "@/components/HeaderCommon.vue";
 import api from "@/axiostoastapi.js";
 import { useI18n } from "vue-i18n";
-import PieChart from '@/components/charts/PieChart.vue';
-import DashboardDialog from '@/components/DashboardDialog.vue';
+import PieChart from "@/components/charts/PieChart.vue";
 import html2canvas from "html2canvas";
-import { rfidTagsData} from '@/mock/rfidTagsMock';
-import {showSuccess, showError, snackbar} from '@/utils/snackbar';
-const dialogVisible = ref(false);
-const dialogType = ref('');
-const readerMapRootOrgId = ref('');
-const showAllReadersByOrg = (orgId) => {
-  dialogType.value = 'allReadersByOrg';
-  readerMapRootOrgId.value = orgId;
-  dialogVisible.value = true;
-};
-const showDetailDialog = (type) => {
-  dialogType.value = type;
-  dialogVisible.value = true;
-};
-const shouldBlink = ref(true)
+import { rfidTagsData } from "@/mock/rfidTagsMock";
+import { showSuccess, showError, snackbar } from "@/utils/snackbar";
+
+const router = useRouter();
+const shouldBlink = ref(true);
 const { t, locale } = useI18n();
 const sectionStates = ref({
   readerStats: { loading: true, error: null },
   supplyTypes: { loading: true, error: null },
   readerCoordinates: { loading: true, error: null },
-  rfidTagCoordinates: { loading: true, error: null }
+  rfidTagCoordinates: { loading: true, error: null },
 });
 const supplyTypeData = ref([]);
 const totalSupplies = ref(0);
@@ -502,49 +734,108 @@ const readerRoleStats = ref([]);
 const computedChartData = computed(() => {
   console.log(" supplyTypeData before transformation:", supplyTypeData.value);
 
-  if (!supplyTypeData.value || supplyTypeData.value.length === 0 || totalSupplies.value === 0) {
+  if (
+    !supplyTypeData.value ||
+    supplyTypeData.value.length === 0 ||
+    totalSupplies.value === 0
+  ) {
     console.warn(" No data available for PieChart!");
     return null; // Prevents PieChart from rendering with invalid data
   }
 
   return {
-    labels: supplyTypeData.value.map(item => {
+    labels: supplyTypeData.value.map((item) => {
       console.log(" Checking supplyTypeData item:", item);
 
       const name = item.typeName || "Unknown"; // Fix: Ensure `typeName` is correctly accessed
-      const percentage = totalSupplies.value > 0
+      const percentage =
+        totalSupplies.value > 0
           ? ((item.count / totalSupplies.value) * 100).toFixed(1)
           : "0.0";
 
       return `${name} (${percentage}%)`;
     }),
-    datasets: [{
-      data: supplyTypeData.value.map(item => item.count || 0),
-      backgroundColor: [
-        '#4285F4', '#34A853', '#FBBC05', '#EA4335',
-        '#FF6D01', '#46BDC6', '#7B1FA2', '#C2185B'
-      ]
-    }]
+    datasets: [
+      {
+        data: supplyTypeData.value.map((item) => item.count || 0),
+        backgroundColor: [
+          "#4285F4",
+          "#34A853",
+          "#FBBC05",
+          "#EA4335",
+          "#FF6D01",
+          "#46BDC6",
+          "#7B1FA2",
+          "#C2185B",
+        ],
+      },
+    ],
   };
 });
 
-const updateReaderRoleStats = d => readerRoleStats.value = [
-  ['readerGateMonitor', d.reader_role_GATE_MONITOR, 'deep-purple-lighten-1', 'mdi-gate'],
-  ['readerRoomMonitor', d.reader_role_ROOM_MONITOR, 'indigo-lighten-1', 'mdi-door'],
-  ['readerPathMonitor', d.reader_role_PATH_MONITOR, 'blue-lighten-1', 'mdi-sign-direction'],
-  ['mongoDbStatus', d.mongoDb_status === "Disconnected" ? t('dashboard.mongoDb.disconnected') : d.mongoDb_status, 'orange-lighten-4', 'mdi-database']
-].map(([key, value, color, icon]) => ({titleKey: `dashboard.stats.${key}`, value, color, icon}));
+// ฟังก์ชันนำทางไปหน้า RFID พร้อมพารามิเตอร์สถานะ
+const navigateToRfidWithStatus = (status) => {
+  router.push({
+    path: "/main/RegisterRfidTags",
+    query: { status },
+  });
+};
+
+// ฟังก์ชันนำทางไปหน้า RegisterReader พร้อมพารามิเตอร์สถานะ
+const navigateToReaderWithStatus = (status) => {
+  router.push({
+    path: "/main/RegisterReader",
+    query: { status },
+  });
+};
+
+const updateReaderRoleStats = (d) =>
+  (readerRoleStats.value = [
+    [
+      "readerGateMonitor",
+      d.reader_role_GATE_MONITOR,
+      "deep-purple-lighten-1",
+      "mdi-gate",
+    ],
+    [
+      "readerRoomMonitor",
+      d.reader_role_ROOM_MONITOR,
+      "indigo-lighten-1",
+      "mdi-door",
+    ],
+    [
+      "readerPathMonitor",
+      d.reader_role_PATH_MONITOR,
+      "blue-lighten-1",
+      "mdi-sign-direction",
+    ],
+    [
+      "mongoDbStatus",
+      d.mongoDb_status === "Disconnected"
+        ? t("dashboard.mongoDb.disconnected")
+        : d.mongoDb_status,
+      "orange-lighten-4",
+      "mdi-database",
+    ],
+  ].map(([key, value, color, icon]) => ({
+    titleKey: `dashboard.stats.${key}`,
+    value,
+    color,
+    icon,
+  })));
 
 const fetchReaderRoleStats = async () => {
   sectionStates.value.readerStats.loading = true;
   sectionStates.value.readerStats.error = null;
   try {
-    const response = await api.get('/api/dashboard', {params: {optionType: 4}});
+    const response = await api.get("/api/dashboard", {
+      params: { optionType: 4 },
+    });
     console.log(response);
     updateReaderRoleStats(response.data);
   } catch (error) {
-    console.error('Error fetching reader stats:', error);
-    sectionStates.value.readerStats.error = t('errors.fetchFailed');
+    console.error("Error fetching reader stats:", error);
+    sectionStates.value.readerStats.error = t("errors.fetchFailed");
   } finally {
     sectionStates.value.readerStats.loading = false;
   }
@@ -554,13 +845,15 @@ const fetchSupplyTypes = async () => {
   sectionStates.value.supplyTypes.loading = true;
   sectionStates.value.supplyTypes.error = null;
   try {
-    const response = await api.get('/api/dashboard', {params: {optionType: 5}});
+    const response = await api.get("/api/dashboard", {
+      params: { optionType: 5 },
+    });
     console.log(response);
     supplyTypeData.value = response.data.supplyTypes;
     totalSupplies.value = response.data.totalSupplies;
   } catch (error) {
-    console.error('Error fetching supply types:', error);
-    sectionStates.value.supplyTypes.error = t('errors.fetchFailed');
+    console.error("Error fetching supply types:", error);
+    sectionStates.value.supplyTypes.error = t("errors.fetchFailed");
   } finally {
     sectionStates.value.supplyTypes.loading = false;
   }
@@ -576,23 +869,26 @@ const togglePieChartFullscreen = () => {
   }
 };
 const fetchDashboardData = async () => {
-  Object.keys(sectionStates.value).forEach(key => {
+  Object.keys(sectionStates.value).forEach((key) => {
     sectionStates.value[key] = { loading: true, error: null };
   });
-  await Promise.all([
-    fetchReaderRoleStats(),
-    fetchSupplyTypes()
-  ]);
+  await Promise.all([fetchReaderRoleStats(), fetchSupplyTypes()]);
 };
 const isLocationMapFullscreen = ref(false);
 const isHeatMapFullscreen = ref(false);
 const toggleLocationMapFullscreen = () => {
-  console.log('Toggle Location Map Full Screen BEFORE ',isLocationMapFullscreen.value);
+  console.log(
+    "Toggle Location Map Full Screen BEFORE ",
+    isLocationMapFullscreen.value
+  );
   isLocationMapFullscreen.value = !isLocationMapFullscreen.value;
   if (isLocationMapFullscreen.value && isHeatMapFullscreen.value) {
     isHeatMapFullscreen.value = false;
   }
-  console.log('Toggle Location Map Full Screen AFTER ',isLocationMapFullscreen.value);
+  console.log(
+    "Toggle Location Map Full Screen AFTER ",
+    isLocationMapFullscreen.value
+  );
   // Force marker recalculation after transition
   setTimeout(() => {
     if (readerCoordinates.value && readerCoordinates.value.length > 0) {
@@ -602,12 +898,12 @@ const toggleLocationMapFullscreen = () => {
 };
 
 const toggleHeatMapFullscreen = () => {
-  console.log('Toggle HeatMap Full Screen BEFORE ',isHeatMapFullscreen.value);
+  console.log("Toggle HeatMap Full Screen BEFORE ", isHeatMapFullscreen.value);
   isHeatMapFullscreen.value = !isHeatMapFullscreen.value;
   if (isHeatMapFullscreen.value && isLocationMapFullscreen.value) {
     isLocationMapFullscreen.value = false;
   }
-  console.log('Toggle HeatMap Full Screen AFTER ',isHeatMapFullscreen.value);
+  console.log("Toggle HeatMap Full Screen AFTER ", isHeatMapFullscreen.value);
   // Force marker recalculation after transition
   setTimeout(() => {
     if (rfidTagsCoordinates.value && rfidTagsCoordinates.value.length > 0) {
@@ -628,18 +924,18 @@ const exportReport = async (format) => {
       // Show loading indicator
       snackbar.value = {
         show: true,
-        text: t('dashboard.exporting') || 'Exporting dashboard...',
-        color: "info"
+        text: t("dashboard.exporting") || "Exporting dashboard...",
+        color: "info",
       };
       // Get all charts first and convert them to images
       const charts = [];
       // Get the pie chart
-      const pieChartElement = document.querySelector('.chart-container canvas');
+      const pieChartElement = document.querySelector(".chart-container canvas");
       if (pieChartElement) {
         charts.push({
           element: pieChartElement,
           dataUrl: pieChartElement.toDataURL(),
-          rect: pieChartElement.getBoundingClientRect()
+          rect: pieChartElement.getBoundingClientRect(),
         });
       }
       // Capture the dashboard
@@ -651,58 +947,62 @@ const exportReport = async (format) => {
         logging: false,
         imageTimeout: 0,
         removeContainer: false,
-        onclone: function(clonedDoc){
+        onclone: function (clonedDoc) {
           // Fix maps in the clone
-          const mapContainers = clonedDoc.querySelectorAll('.map-container');
-          const mapImages = clonedDoc.querySelectorAll('.organization-map');
+          const mapContainers = clonedDoc.querySelectorAll(".map-container");
+          const mapImages = clonedDoc.querySelectorAll(".organization-map");
 
-          mapContainers.forEach(container => {
-            container.style.display = 'flex';
-            container.style.justifyContent = 'center';
-            container.style.alignItems = 'center';
-            container.style.overflow = 'hidden';
+          mapContainers.forEach((container) => {
+            container.style.display = "flex";
+            container.style.justifyContent = "center";
+            container.style.alignItems = "center";
+            container.style.overflow = "hidden";
           });
-          mapImages.forEach(img => {
-            img.style.objectFit = 'contain';
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '100%';
-            img.style.width = 'auto';
-            img.style.height = 'auto';
-            img.style.display = 'block';
-            img.style.margin = '0 auto';
-            img.style.opacity = '1';
+          mapImages.forEach((img) => {
+            img.style.objectFit = "contain";
+            img.style.maxWidth = "100%";
+            img.style.maxHeight = "100%";
+            img.style.width = "auto";
+            img.style.height = "auto";
+            img.style.display = "block";
+            img.style.margin = "0 auto";
+            img.style.opacity = "1";
           });
           // Replace pie chart with captured image
-          charts.forEach(chart => {
-            const cloneChart = clonedDoc.querySelector('.chart-container canvas');
+          charts.forEach((chart) => {
+            const cloneChart = clonedDoc.querySelector(
+              ".chart-container canvas"
+            );
             if (cloneChart) {
-              const img = document.createElement('img');
+              const img = document.createElement("img");
               img.src = chart.dataUrl;
-              img.style.width = chart.rect.width + 'px';
-              img.style.height = chart.rect.height + 'px';
+              img.style.width = chart.rect.width + "px";
+              img.style.height = chart.rect.height + "px";
               cloneChart.parentNode.replaceChild(img, cloneChart);
             }
           });
-        }
+        },
       });
       // Convert to PNG and download
       const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = image;
-      link.download = `dashboard_report_${new Date().toISOString().slice(0,10)}.png`;
+      link.download = `dashboard_report_${new Date()
+        .toISOString()
+        .slice(0, 10)}.png`;
       link.click();
       // Show success message
       snackbar.value = {
         show: true,
-        text: t('dashboard.exportSuccess') || 'Export successful!',
-        color: "success"
+        text: t("dashboard.exportSuccess") || "Export successful!",
+        color: "success",
       };
     } catch (error) {
       console.error("Error exporting PNG:", error);
       snackbar.value = {
         show: true,
-        text: t('dashboard.exportFailed') || 'Export failed. Please try again.',
-        color: "error"
+        text: t("dashboard.exportFailed") || "Export failed. Please try again.",
+        color: "error",
       };
     }
   }
@@ -710,18 +1010,18 @@ const exportReport = async (format) => {
 // Extended Organization Map
 
 // UUIDs are required to be pass for get Supply
-const organizationHierarchy = ref([])
+const organizationHierarchy = ref([]);
 const fetchOrganizationHierarchy = async () => {
   try {
-    const response = await api.get('/api/organization-hierarchies/9levels')
+    const response = await api.get("/api/organization-hierarchies/9levels");
     // Log full response object for detailed information
     console.log("Full response:", response);
     // Log response data only
     console.log("Fetch full organization:", response.data);
-    showSuccess(t('fetch_organization_successfully'));
-    organizationHierarchy.value = response.data
+    showSuccess(t("fetch_organization_successfully"));
+    organizationHierarchy.value = response.data;
   } catch (error) {
-    showError(t('error_loading_organizations'))
+    showError(t("error_loading_organizations"));
   }
 };
 
@@ -730,18 +1030,18 @@ const readerMapUrl = ref(null);
 const heatMapUrl = ref(null);
 const currentReaderMapIndex = ref(0);
 const currentHeatMapIndex = ref(0);
-const currentOrgName = ref('');
+const currentOrgName = ref("");
 const translatedOrgName = computed(() => {
-  if (!currentOrgName.value) return '';
+  if (!currentOrgName.value) return "";
 
-  return locale.value === 'th'
-      ? currentOrgName.value?.th || currentOrgName.value
-      : currentOrgName.value?.en || currentOrgName.value;
+  return locale.value === "th"
+    ? currentOrgName.value?.th || currentOrgName.value
+    : currentOrgName.value?.en || currentOrgName.value;
 });
 
 sectionStates.value.organizationMap = { loading: true, error: null };
 const getRootOrganizations = (hierarchy) => {
-  return hierarchy.filter(org => !org.parentUUID);
+  return hierarchy.filter((org) => !org.parentUUID);
 };
 
 const initializeReaderMapData = async () => {
@@ -753,10 +1053,10 @@ const initializeReaderMapData = async () => {
     console.log("Root Organizations:", rootOrganizations.value);
     if (rootOrganizations.value.length > 0) {
       //await loadCurrentMap('reader');  // Load Reader Map first
-      await loadCurrentReaderMap();  // Load Reader Map first
+      await loadCurrentReaderMap(); // Load Reader Map first
     }
   } catch (error) {
-    console.error('Error initializing map data:', error);
+    console.error("Error initializing map data:", error);
     sectionStates.value.organizationMap.error = true;
   } finally {
     sectionStates.value.organizationMap.loading = false;
@@ -775,7 +1075,7 @@ const initializeHeatMapData = async () => {
       await loadCurrentHeatMap();
     }
   } catch (error) {
-    console.error('Error initializing map data:', error);
+    console.error("Error initializing map data:", error);
     sectionStates.value.organizationMap.error = true;
   } finally {
     sectionStates.value.organizationMap.loading = false;
@@ -796,8 +1096,8 @@ const loadCurrentReaderMap = async () => {
     await fetchReaderCoordinates(currentOrg.id);
     // Fetch the reader map image
     const response = await api.get(
-        `/api/organization-maps/org/${currentOrg.id}`,
-        { responseType: "blob" }
+      `/api/organization-maps/org/${currentOrg.id}`,
+      { responseType: "blob" }
     );
     if (response.status === 200) {
       const blob = new Blob([response.data], { type: "image/jpeg" });
@@ -827,8 +1127,8 @@ const loadCurrentHeatMap = async () => {
     await fetchRfidTagsCoordinates(currentOrg.id);
     // Fetch the heat map image
     const response = await api.get(
-        `/api/organization-maps/org/${currentOrg.id}`,
-        { responseType: "blob" }
+      `/api/organization-maps/org/${currentOrg.id}`,
+      { responseType: "blob" }
     );
     if (response.status === 200) {
       const blob = new Blob([response.data], { type: "image/jpeg" });
@@ -845,18 +1145,32 @@ const loadCurrentHeatMap = async () => {
   }
 };
 const cycleToNextReaderMap = async () => {
-  if (rootOrganizations.value.length <= 1) {console.warn("Only one map available, cannot cycle.");return;}
-  if (readerMapUrl.value) {console.log("Cleaning up previous reader map URL...");URL.revokeObjectURL(readerMapUrl.value);}
-  currentReaderMapIndex.value = (currentReaderMapIndex.value + 1) % rootOrganizations.value.length;
+  if (rootOrganizations.value.length <= 1) {
+    console.warn("Only one map available, cannot cycle.");
+    return;
+  }
+  if (readerMapUrl.value) {
+    console.log("Cleaning up previous reader map URL...");
+    URL.revokeObjectURL(readerMapUrl.value);
+  }
+  currentReaderMapIndex.value =
+    (currentReaderMapIndex.value + 1) % rootOrganizations.value.length;
   console.log("New Reader Map Index:", currentReaderMapIndex.value);
   await loadCurrentReaderMap();
 };
 
 const cycleToPreviousReaderMap = async () => {
   console.log("Button Clicked: Previous Reader Map");
-  if (rootOrganizations.value.length <= 1) {console.warn("Only one map available, cannot cycle.");return;}
-  if (readerMapUrl.value) {console.log("Cleaning up previous reader map URL...");URL.revokeObjectURL(readerMapUrl.value);}
-  currentReaderMapIndex.value = (currentReaderMapIndex.value === 0)
+  if (rootOrganizations.value.length <= 1) {
+    console.warn("Only one map available, cannot cycle.");
+    return;
+  }
+  if (readerMapUrl.value) {
+    console.log("Cleaning up previous reader map URL...");
+    URL.revokeObjectURL(readerMapUrl.value);
+  }
+  currentReaderMapIndex.value =
+    currentReaderMapIndex.value === 0
       ? rootOrganizations.value.length - 1
       : currentReaderMapIndex.value - 1;
   console.log("New Reader Map Index:", currentReaderMapIndex.value);
@@ -865,13 +1179,15 @@ const cycleToPreviousReaderMap = async () => {
 const cycleToNextHeatMap = async () => {
   if (rootOrganizations.value.length <= 1) return;
   if (heatMapUrl.value) URL.revokeObjectURL(heatMapUrl.value); // Free old map URL
-  currentHeatMapIndex.value = (currentHeatMapIndex.value + 1) % rootOrganizations.value.length;
+  currentHeatMapIndex.value =
+    (currentHeatMapIndex.value + 1) % rootOrganizations.value.length;
   await loadCurrentHeatMap();
 };
 const cycleToPreviousHeatMap = async () => {
   if (rootOrganizations.value.length <= 1) return;
   if (heatMapUrl.value) URL.revokeObjectURL(heatMapUrl.value); // Free memory
-  currentHeatMapIndex.value = (currentHeatMapIndex.value === 0)
+  currentHeatMapIndex.value =
+    currentHeatMapIndex.value === 0
       ? rootOrganizations.value.length - 1
       : currentHeatMapIndex.value - 1;
   await loadCurrentHeatMap();
@@ -881,33 +1197,39 @@ const getTagMapMarkerStyle = () => {
   if (!tagMapCoordinates.value) return {};
   return {
     left: `${tagMapCoordinates.value.x}%`,
-    top: `${tagMapCoordinates.value.y}%`
+    top: `${tagMapCoordinates.value.y}%`,
   };
 };
 // Plot Readers on Map
 sectionStates.value.readerCoordinates = { loading: false, error: null };
 const readerCoordinates = ref([]);
 const fetchReaderCoordinates = async (organizationId) => {
-  console.log(`===== FETCHING READER COORDINATES FOR ORG: ${organizationId} =====`);
+  console.log(
+    `===== FETCHING READER COORDINATES FOR ORG: ${organizationId} =====`
+  );
   sectionStates.value.readerCoordinates.loading = true;
   sectionStates.value.readerCoordinates.error = null;
   try {
-    const response = await api.get('/api/rfid_readers/coordinates');
+    const response = await api.get("/api/rfid_readers/coordinates");
     console.log("API response received:", response.data);
     // Filter for readers belonging to the current organization
     const filteredReaders = response.data.filter(
-        reader => reader.organizationId === organizationId
+      (reader) => reader.organizationId === organizationId
     );
-    console.log(`Filtered ${filteredReaders.length} readers for organization ${organizationId}`);
+    console.log(
+      `Filtered ${filteredReaders.length} readers for organization ${organizationId}`
+    );
     // Log each reader's coordinates
     filteredReaders.forEach((reader, index) => {
-      console.log(`Reader ${index + 1}: ID=${reader.id || reader.readerSerialNumber}, ` +
+      console.log(
+        `Reader ${index + 1}: ID=${reader.id || reader.readerSerialNumber}, ` +
           `Coordinates=(${reader.x_coordinate}, ${reader.y_coordinate}), ` +
-          `Status=${reader.status}, Role=${reader.role}`);
+          `Status=${reader.status}, Role=${reader.role}`
+      );
     });
     readerCoordinates.value = filteredReaders;
   } catch (error) {
-    console.error('Error fetching reader coordinates:', error);
+    console.error("Error fetching reader coordinates:", error);
     sectionStates.value.readerCoordinates.error = error;
   } finally {
     sectionStates.value.readerCoordinates.loading = false;
@@ -939,8 +1261,9 @@ const handleResize = () => {
   // Clear any existing timeout to debounce the resize events
   if (resizeTimeout) clearTimeout(resizeTimeout);
   // Detect if this is likely a maximize/restore event
-  const isMaximizeEvent = Math.abs(window.innerWidth - previousWidth) > 200 ||
-      Math.abs(window.innerHeight - previousHeight) > 200;
+  const isMaximizeEvent =
+    Math.abs(window.innerWidth - previousWidth) > 200 ||
+    Math.abs(window.innerHeight - previousHeight) > 200;
   // Set a timeout to avoid multiple rapid recalculations
   resizeTimeout = setTimeout(() => {
     // Store current dimensions for next comparison
@@ -949,18 +1272,24 @@ const handleResize = () => {
 
     // For maximize events, use a more aggressive retry strategy
     if (isMaximizeEvent) {
-      console.log("Detected maximize/restore event - using extended recalculation strategy");
+      console.log(
+        "Detected maximize/restore event - using extended recalculation strategy"
+      );
       // Series of recalculations at increasing intervals
       const intervals = [50, 150, 300, 500, 1000]; // milliseconds
-      intervals.forEach(delay => {
+      intervals.forEach((delay) => {
         setTimeout(() => {
-
           if (readerCoordinates.value && readerCoordinates.value.length > 0) {
-            console.log(`Recalculating marker positions after maximize/restore (delay: ${delay}ms)`);
+            console.log(
+              `Recalculating marker positions after maximize/restore (delay: ${delay}ms)`
+            );
             readerCoordinates.value = [...readerCoordinates.value];
           }
           // Recalculate RFID tag cluster positions
-          if (rfidTagsCoordinates.value && rfidTagsCoordinates.value.length > 0) {
+          if (
+            rfidTagsCoordinates.value &&
+            rfidTagsCoordinates.value.length > 0
+          ) {
             console.log(`Recalculating RFID tag positions (delay: ${delay}ms)`);
             rfidTagsCoordinates.value = [...rfidTagsCoordinates.value];
           }
@@ -982,19 +1311,23 @@ const handleResize = () => {
 };
 
 // Also handle browser fullscreen events
-document.addEventListener('fullscreenchange', () => {
+document.addEventListener("fullscreenchange", () => {
   console.log("Browser fullscreen state changed");
   // Use the same staggered approach as for maximize
   const intervals = [100, 300, 500, 1000];
-  intervals.forEach(delay => {
+  intervals.forEach((delay) => {
     setTimeout(() => {
       if (readerCoordinates.value && readerCoordinates.value.length > 0) {
-        console.log(`Recalculating marker positions after fullscreen change (delay: ${delay}ms)`);
+        console.log(
+          `Recalculating marker positions after fullscreen change (delay: ${delay}ms)`
+        );
         readerCoordinates.value = [...readerCoordinates.value];
       }
       // Recalculate RFID tag cluster positions
       if (rfidTagsCoordinates.value && rfidTagsCoordinates.value.length > 0) {
-        console.log(`Recalculating RFID tag positions after fullscreen change (delay: ${delay}ms)`);
+        console.log(
+          `Recalculating RFID tag positions after fullscreen change (delay: ${delay}ms)`
+        );
         rfidTagsCoordinates.value = [...rfidTagsCoordinates.value];
       }
     }, delay);
@@ -1002,27 +1335,39 @@ document.addEventListener('fullscreenchange', () => {
 });
 // Improve the getReaderMarkerStyle function for more stability
 const getReaderMarkerStyle = (reader) => {
-  console.log(`===== MARKER POSITIONING FOR READER ${reader.id || reader.readerSerialNumber} =====`);
-  console.log(`Reader coordinates: x=${reader.x_coordinate}, y=${reader.y_coordinate}`);
+  console.log(
+    `===== MARKER POSITIONING FOR READER ${
+      reader.id || reader.readerSerialNumber
+    } =====`
+  );
+  console.log(
+    `Reader coordinates: x=${reader.x_coordinate}, y=${reader.y_coordinate}`
+  );
   // Get the image element to calculate proper scaling
   //const mapImage = document.querySelector('.organization-map');
-  const mapImage = document.querySelector('#reader-map-container .organization-map');
+  const mapImage = document.querySelector(
+    "#reader-map-container .organization-map"
+  );
   if (!mapImage) {
     console.error("Map image element not found!");
-    return { display: 'none' };
+    return { display: "none" };
   }
   // Log image load state
   console.log(`Image complete: ${mapImage.complete}`);
-  console.log(`Image natural dimensions: ${mapImage.naturalWidth}x${mapImage.naturalHeight}`);
+  console.log(
+    `Image natural dimensions: ${mapImage.naturalWidth}x${mapImage.naturalHeight}`
+  );
   if (!mapImage.complete || !mapImage.naturalWidth) {
     console.warn("Image not fully loaded, deferring marker positioning");
-    return { display: 'none' };
+    return { display: "none" };
   }
   // Get container dimensions
   const container = mapImage.parentElement;
   const containerRect = container.getBoundingClientRect();
   const imgRect = mapImage.getBoundingClientRect();
-  console.log(`Container dimensions: ${containerRect.width}x${containerRect.height}`);
+  console.log(
+    `Container dimensions: ${containerRect.width}x${containerRect.height}`
+  );
   console.log(`Image display dimensions: ${imgRect.width}x${imgRect.height}`);
   // Calculate aspect ratios
   const imgAspectRatio = mapImage.naturalWidth / mapImage.naturalHeight;
@@ -1030,7 +1375,8 @@ const getReaderMarkerStyle = (reader) => {
   console.log(`Image aspect ratio: ${imgAspectRatio.toFixed(4)}`);
   console.log(`Container aspect ratio: ${containerAspectRatio.toFixed(4)}`);
   // Calculate letterboxing
-  let offsetX = 0, offsetY = 0;
+  let offsetX = 0,
+    offsetY = 0;
   let scaledWidth, scaledHeight;
   if (imgAspectRatio > containerAspectRatio) {
     // Image is wider than container (letterboxing on top/bottom)
@@ -1038,7 +1384,9 @@ const getReaderMarkerStyle = (reader) => {
     scaledHeight = imgRect.width / imgAspectRatio;
     offsetY = (imgRect.height - scaledHeight) / 2;
     console.log(`Letterboxing on top/bottom`);
-    console.log(`Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`);
+    console.log(
+      `Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`
+    );
     console.log(`Vertical offset (Y): ${offsetY.toFixed(2)}px`);
   } else {
     // Image is taller than container (letterboxing on sides)
@@ -1046,29 +1394,35 @@ const getReaderMarkerStyle = (reader) => {
     scaledWidth = imgRect.height * imgAspectRatio;
     offsetX = (imgRect.width - scaledWidth) / 2;
     console.log(`Letterboxing on sides`);
-    console.log(`Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`);
+    console.log(
+      `Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`
+    );
     console.log(`Horizontal offset (X): ${offsetX.toFixed(2)}px`);
   }
   // Calculate the scaling factors
   const scaleX = scaledWidth / mapImage.naturalWidth;
   const scaleY = scaledHeight / mapImage.naturalHeight;
-  console.log(`Scaling factors: X=${scaleX.toFixed(4)}, Y=${scaleY.toFixed(4)}`);
+  console.log(
+    `Scaling factors: X=${scaleX.toFixed(4)}, Y=${scaleY.toFixed(4)}`
+  );
   // Convert the coordinates (accounting for both scaling and offset)
-  const pixelX = (reader.x_coordinate * scaleX) + offsetX;
-  const pixelY = (reader.y_coordinate * scaleY) + offsetY;
+  const pixelX = reader.x_coordinate * scaleX + offsetX;
+  const pixelY = reader.y_coordinate * scaleY + offsetY;
   // Convert to percentages relative to container
   const percentX = (pixelX / imgRect.width) * 100;
   const percentY = (pixelY / imgRect.height) * 100;
   console.log(`Converted coordinates:`);
   console.log(`  - Pixels: (${pixelX.toFixed(2)}, ${pixelY.toFixed(2)})`);
-  console.log(`  - Percent: (${percentX.toFixed(2)}%, ${percentY.toFixed(2)}%)`);
+  console.log(
+    `  - Percent: (${percentX.toFixed(2)}%, ${percentY.toFixed(2)}%)`
+  );
   return {
-    position: 'absolute',
+    position: "absolute",
     left: `${percentX}%`,
     top: `${percentY}%`,
-    transform: 'translate(-50%, -50%)',
-    cursor: 'pointer',
-    zIndex: 2
+    transform: "translate(-50%, -50%)",
+    cursor: "pointer",
+    zIndex: 2,
   };
 };
 const getReaderTooltip = (reader) => {
@@ -1078,15 +1432,19 @@ Role: ${reader.role}
 IP: ${reader.ipAddress}`;
 };
 const getReaderColor = (status) => {
-  return status === 'ONLINE' ? 'green' : 'red';
+  return status === "ONLINE" ? "green" : "red";
 };
 // map-marker-radius, map-marker-circle, map-marker-radius-outline, map-marker, alpha-r-circle, alpha-d-circle
 const getReaderIcon = (role) => {
   switch (role) {
-    case 'GATE_MONITOR': return 'mdi-map-marker-radius-outline';
-    case 'ROOM_MONITOR': return 'mdi-map-marker-circle';
-    case 'PATH_MONITOR': return 'mdi-map-marker-radius';
-    default: return 'mdi-map-marker-radius';
+    case "GATE_MONITOR":
+      return "mdi-map-marker-radius-outline";
+    case "ROOM_MONITOR":
+      return "mdi-map-marker-circle";
+    case "PATH_MONITOR":
+      return "mdi-map-marker-radius";
+    default:
+      return "mdi-map-marker-radius";
   }
 };
 const handleReaderImageClick = (event) => {
@@ -1105,35 +1463,41 @@ const totalTagCount = ref(0);
 const rfidTagsCoordinates = ref([]);
 
 const fetchRfidTagsCoordinates = async (organizationId) => {
-  console.log(`######### FETCHING RFID TAG COORDINATES FOR ORG: ${organizationId} =====`);
+  console.log(
+    `######### FETCHING RFID TAG COORDINATES FOR ORG: ${organizationId} =====`
+  );
   sectionStates.value.rfidTagCoordinates.loading = true;
   sectionStates.value.rfidTagCoordinates.error = null;
   try {
-
     let data;
-    if (useMockData){
+    if (useMockData) {
       // Use mock data
       console.log("######### Using mock RFID tag data");
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       data = rfidTagsData;
       //data = blankMockupData;
-    }else {
+    } else {
       // Use real API
-      const response = await api.get('/api/rfid_tags_tracking_V2/coordinates-cluster');
+      const response = await api.get(
+        "/api/rfid_tags_tracking_V2/coordinates-cluster"
+      );
       data = response.data;
     }
-    console.log("######### RFID reader and tag data cluster coordinates received:", data);
+    console.log(
+      "######### RFID reader and tag data cluster coordinates received:",
+      data
+    );
     // Filter for readers belonging to the current organization
     const filteredClusters = data.filter(
-        cluster => cluster.organizationId === organizationId
+      (cluster) => cluster.organizationId === organizationId
     );
     // Store the filtered data without processing
     rfidTagsCoordinates.value = filteredClusters;
     // Process the data for display
     processTagClusters(filteredClusters);
   } catch (error) {
-    console.error('######### Error fetching reader coordinates:', error);
+    console.error("######### Error fetching reader coordinates:", error);
     sectionStates.value.rfidTagCoordinates.error = error;
   } finally {
     sectionStates.value.rfidTagCoordinates.loading = false;
@@ -1143,22 +1507,23 @@ const fetchRfidTagsCoordinates = async (organizationId) => {
 const processTagClusters = (readers) => {
   console.log("Processing tag clusters:", readers.length);
   // Calculate total tags
-  totalTagCount.value = readers.reduce((sum, reader) =>
-      sum + (reader.tagCount || (reader.tags?.length || 0)), 0
+  totalTagCount.value = readers.reduce(
+    (sum, reader) => sum + (reader.tagCount || reader.tags?.length || 0),
+    0
   );
   // Process supply breakdown for each reader
-  const processedReaders = readers.map(reader => {
+  const processedReaders = readers.map((reader) => {
     // Generate supply breakdown (count by supply type)
     const supplyBreakdown = {};
     if (reader.tags && reader.tags.length > 0) {
-      reader.tags.forEach(tag => {
+      reader.tags.forEach((tag) => {
         // Create a key from supply name
-        const key = tag.supplyName || 'Unknown';
+        const key = tag.supplyName || "Unknown";
         if (!supplyBreakdown[key]) {
           supplyBreakdown[key] = {
-            supplyName: tag.supplyName || 'Unknown',
+            supplyName: tag.supplyName || "Unknown",
             count: 0,
-            trackingStatus: tag.trackingStatus || 'UNKNOWN'
+            trackingStatus: tag.trackingStatus || "UNKNOWN",
           };
         }
         supplyBreakdown[key].count++;
@@ -1168,28 +1533,30 @@ const processTagClusters = (readers) => {
     return {
       ...reader,
       // Convert supply breakdown object to array for easier rendering
-      supplyBreakdownArray: Object.values(supplyBreakdown)
+      supplyBreakdownArray: Object.values(supplyBreakdown),
     };
   });
   // Update the rfidTagsCoordinates with processed data
   rfidTagsCoordinates.value = processedReaders;
-  console.log(`Processed ${processedReaders.length} readers with ${totalTagCount.value} total tags`);
+  console.log(
+    `Processed ${processedReaders.length} readers with ${totalTagCount.value} total tags`
+  );
 };
 // Get color for tag cluster based on count
 const getClusterColor = (count) => {
-  if (count > 100) return '#F44336'; // Red for 100+
-  if (count > 50) return '#FF9800';  // Orange for 51-100
-  if (count > 20) return '#4CAF50';  // Green for 21-50
-  return '#42A5F5';                  // Blue for 1-20
+  if (count > 100) return "#F44336"; // Red for 100+
+  if (count > 50) return "#FF9800"; // Orange for 51-100
+  if (count > 20) return "#4CAF50"; // Green for 21-50
+  return "#42A5F5"; // Blue for 1-20
 };
 // Get size for tag cluster based on count
 const getClusterSize = (count) => {
   const baseSize = 24;
-  if (count > 100) return baseSize * 2;      // Largest
-  if (count > 50) return baseSize * 1.75;    // Large
-  if (count > 20) return baseSize * 1.5;     // Medium
-  if (count > 5) return baseSize * 1.25;     // Medium-small
-  return baseSize;                           // Smallest
+  if (count > 100) return baseSize * 2; // Largest
+  if (count > 50) return baseSize * 1.75; // Large
+  if (count > 20) return baseSize * 1.5; // Medium
+  if (count > 5) return baseSize * 1.25; // Medium-small
+  return baseSize; // Smallest
 };
 const showClusterDetails = (cluster) => {
   console.log("Cluster clicked:", cluster);
@@ -1199,26 +1566,36 @@ const showClusterDetails = (cluster) => {
 // Add these refs if not already present
 const selectedCluster = ref(null);
 const getTagMarkerStyle = (cluster) => {
-  console.log(`===== MARKER POSITIONING FOR CLUSTER ${cluster.readerSerialNumber} =====`);
-  console.log(`Cluster coordinates: x=${cluster.x_coordinate}, y=${cluster.y_coordinate}`);
+  console.log(
+    `===== MARKER POSITIONING FOR CLUSTER ${cluster.readerSerialNumber} =====`
+  );
+  console.log(
+    `Cluster coordinates: x=${cluster.x_coordinate}, y=${cluster.y_coordinate}`
+  );
   // Get the image element to calculate proper scaling
-  const mapImage = document.querySelector('#rfid-map-container .organization-map');
+  const mapImage = document.querySelector(
+    "#rfid-map-container .organization-map"
+  );
   if (!mapImage) {
     console.error("Map image element not found!");
-    return { display: 'none' };
+    return { display: "none" };
   }
   // Log image load state
   console.log(`Image complete: ${mapImage.complete}`);
-  console.log(`Image natural dimensions: ${mapImage.naturalWidth}x${mapImage.naturalHeight}`);
+  console.log(
+    `Image natural dimensions: ${mapImage.naturalWidth}x${mapImage.naturalHeight}`
+  );
   if (!mapImage.complete || !mapImage.naturalWidth) {
     console.warn("Image not fully loaded, deferring marker positioning");
-    return { display: 'none' };
+    return { display: "none" };
   }
   // Get container dimensions
   const container = mapImage.parentElement;
   const containerRect = container.getBoundingClientRect();
   const imgRect = mapImage.getBoundingClientRect();
-  console.log(`Container dimensions: ${containerRect.width}x${containerRect.height}`);
+  console.log(
+    `Container dimensions: ${containerRect.width}x${containerRect.height}`
+  );
   console.log(`Image display dimensions: ${imgRect.width}x${imgRect.height}`);
   // Calculate aspect ratios
   const imgAspectRatio = mapImage.naturalWidth / mapImage.naturalHeight;
@@ -1226,7 +1603,8 @@ const getTagMarkerStyle = (cluster) => {
   console.log(`Image aspect ratio: ${imgAspectRatio.toFixed(4)}`);
   console.log(`Container aspect ratio: ${containerAspectRatio.toFixed(4)}`);
   // Calculate letterboxing
-  let offsetX = 0, offsetY = 0;
+  let offsetX = 0,
+    offsetY = 0;
   let scaledWidth, scaledHeight;
   if (imgAspectRatio > containerAspectRatio) {
     // Image is wider than container (letterboxing on top/bottom)
@@ -1234,7 +1612,9 @@ const getTagMarkerStyle = (cluster) => {
     scaledHeight = imgRect.width / imgAspectRatio;
     offsetY = (imgRect.height - scaledHeight) / 2;
     console.log(`Letterboxing on top/bottom`);
-    console.log(`Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`);
+    console.log(
+      `Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`
+    );
     console.log(`Vertical offset (Y): ${offsetY.toFixed(2)}px`);
   } else {
     // Image is taller than container (letterboxing on sides)
@@ -1242,29 +1622,35 @@ const getTagMarkerStyle = (cluster) => {
     scaledWidth = imgRect.height * imgAspectRatio;
     offsetX = (imgRect.width - scaledWidth) / 2;
     console.log(`Letterboxing on sides`);
-    console.log(`Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`);
+    console.log(
+      `Scaled dimensions: ${scaledWidth.toFixed(2)}x${scaledHeight.toFixed(2)}`
+    );
     console.log(`Horizontal offset (X): ${offsetX.toFixed(2)}px`);
   }
   // Calculate the scaling factors
   const scaleX = scaledWidth / mapImage.naturalWidth;
   const scaleY = scaledHeight / mapImage.naturalHeight;
-  console.log(`Scaling factors: X=${scaleX.toFixed(4)}, Y=${scaleY.toFixed(4)}`);
+  console.log(
+    `Scaling factors: X=${scaleX.toFixed(4)}, Y=${scaleY.toFixed(4)}`
+  );
   // Convert the coordinates (accounting for both scaling and offset)
-  const pixelX = (cluster.x_coordinate * scaleX) + offsetX;
-  const pixelY = (cluster.y_coordinate * scaleY) + offsetY;
+  const pixelX = cluster.x_coordinate * scaleX + offsetX;
+  const pixelY = cluster.y_coordinate * scaleY + offsetY;
   // Convert to percentages relative to container
   const percentX = (pixelX / imgRect.width) * 100;
   const percentY = (pixelY / imgRect.height) * 100;
   console.log(`Converted coordinates:`);
   console.log(`  - Pixels: (${pixelX.toFixed(2)}, ${pixelY.toFixed(2)})`);
-  console.log(`  - Percent: (${percentX.toFixed(2)}%, ${percentY.toFixed(2)}%)`);
+  console.log(
+    `  - Percent: (${percentX.toFixed(2)}%, ${percentY.toFixed(2)}%)`
+  );
   return {
-    position: 'absolute',
+    position: "absolute",
     left: `${percentX}%`,
     top: `${percentY}%`,
-    transform: 'translate(-50%, -50%)',
+    transform: "translate(-50%, -50%)",
     zIndex: 25,
-    pointerEvents: 'auto'
+    pointerEvents: "auto",
   };
 };
 
@@ -1293,60 +1679,79 @@ const pageCount = computed(() => {
 });
 // Generate pagination text (e.g., "1-5 of 10")
 const getPaginationText = () => {
-  if (filteredTags.value.length === 0) return '0-0 of 0';
-  if (itemsPerPage.value === -1) return `1-${filteredTags.value.length} of ${filteredTags.value.length}`;
+  if (filteredTags.value.length === 0) return "0-0 of 0";
+  if (itemsPerPage.value === -1)
+    return `1-${filteredTags.value.length} of ${filteredTags.value.length}`;
   const start = (page.value - 1) * itemsPerPage.value + 1;
-  const end = Math.min(page.value * itemsPerPage.value, filteredTags.value.length);
+  const end = Math.min(
+    page.value * itemsPerPage.value,
+    filteredTags.value.length
+  );
   return `${start}-${end} of ${filteredTags.value.length}`;
 };
 const tagHeaders = computed(() => [
-  { title: t('index'), key: 'index', align: 'start', width: 80 },
-  { title: t('supply_name'), key: 'supplyName' },
-  { title: t('rfid_no'), key: 'rfidNumber' },
-  { title: t('tracking_status'), key: 'trackingStatus', align: 'center' }
+  { title: t("index"), key: "index", align: "start", width: 80 },
+  { title: t("supply_name"), key: "supplyName" },
+  { title: t("rfid_no"), key: "rfidNumber" },
+  { title: t("tracking_status"), key: "trackingStatus", align: "center" },
 ]);
 // Add index to the filtered tags
 const filteredTags = computed(() => {
   if (!selectedCluster.value || !selectedCluster.value.tags) return [];
   return selectedCluster.value.tags
-      .filter(tag =>
-          searchTag.value === "" ||
-          (tag.supplyName && tag.supplyName.toLowerCase().includes(searchTag.value.toLowerCase())) ||
-          (tag.rfidNumber && tag.rfidNumber.toLowerCase().includes(searchTag.value.toLowerCase()))
-      )
-      .map((tag, index) => ({
-        index: index + 1,
-        supplyName: tag.supplyName,
-        rfidNumber: tag.rfidNumber,
-        trackingStatus: tag.trackingStatus
-      }));
+    .filter(
+      (tag) =>
+        searchTag.value === "" ||
+        (tag.supplyName &&
+          tag.supplyName
+            .toLowerCase()
+            .includes(searchTag.value.toLowerCase())) ||
+        (tag.rfidNumber &&
+          tag.rfidNumber.toLowerCase().includes(searchTag.value.toLowerCase()))
+    )
+    .map((tag, index) => ({
+      index: index + 1,
+      supplyName: tag.supplyName,
+      rfidNumber: tag.rfidNumber,
+      trackingStatus: tag.trackingStatus,
+    }));
 });
 const getTrackingStatusColor = (status) => {
   switch (status) {
-    case "ACTIVE": return "green";
-    case "INACTIVE": return "orange";
-    case "LOST": return "red";
-    default: return "gray";
+    case "ACTIVE":
+      return "green";
+    case "INACTIVE":
+      return "orange";
+    case "LOST":
+      return "red";
+    default:
+      return "gray";
   }
 };
 
 onMounted(async () => {
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
   await Promise.all([
     fetchDashboardData(),
     initializeReaderMapData(),
-    initializeHeatMapData()
+    initializeHeatMapData(),
   ]);
   // Set up ResizeObserver for RFID Heat Map
   if (window.ResizeObserver) {
-    const rfidMapObserver = new ResizeObserver(entries => {
+    const rfidMapObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        console.log("RFID Heat Map container size changed:", entry.contentRect.width, entry.contentRect.height);
+        console.log(
+          "RFID Heat Map container size changed:",
+          entry.contentRect.width,
+          entry.contentRect.height
+        );
         handleRFIDTagsResize();
       }
     });
     setTimeout(() => {
-      const rfidMapContainer = document.querySelector('#rfid-map-container .organization-map');
+      const rfidMapContainer = document.querySelector(
+        "#rfid-map-container .organization-map"
+      );
       if (rfidMapContainer) {
         rfidMapObserver.observe(rfidMapContainer);
       }
@@ -1355,14 +1760,20 @@ onMounted(async () => {
 
   // Set up ResizeObserver for Reader Location Map
   if (window.ResizeObserver) {
-    const readerMapObserver = new ResizeObserver(entries => {
+    const readerMapObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        console.log("Reader Location Map container size changed:", entry.contentRect.width, entry.contentRect.height);
+        console.log(
+          "Reader Location Map container size changed:",
+          entry.contentRect.width,
+          entry.contentRect.height
+        );
         handleReaderResize();
       }
     });
     setTimeout(() => {
-      const readerMapContainer = document.querySelector('#reader-map-container .organization-map');
+      const readerMapContainer = document.querySelector(
+        "#reader-map-container .organization-map"
+      );
       if (readerMapContainer) {
         readerMapObserver.observe(readerMapContainer);
       }
@@ -1398,7 +1809,9 @@ const fetchReaderNotes = async (cluster) => {
   if (!cluster.readerSerialNumber || cluster.notesLoaded) return;
 
   try {
-    const response = await api.get(`/api/rfid_readers/serial_number/${cluster.readerSerialNumber}/notes`);
+    const response = await api.get(
+      `/api/rfid_readers/serial_number/${cluster.readerSerialNumber}/notes`
+    );
     if (response.status === 200) {
       cluster.note = response.data;
     }
@@ -1410,7 +1823,7 @@ const fetchReaderNotes = async (cluster) => {
 };
 const getClusterTooltip = (cluster) => {
   return `ID: ${cluster.readerSerialNumber}
-Note: ${cluster.note || 'UNKNOWN'}`;
+Note: ${cluster.note || "UNKNOWN"}`;
 };
 
 const hoveredCluster = ref(null);
@@ -1419,24 +1832,21 @@ const handleClusterHover = async (cluster) => {
   await fetchReaderNotes(cluster);
 };
 
-
 // Separate Organization Name for Reader Map and Tag Density Map
-const readerMapOrgName = ref('');
-const heatMapOrgName = ref('');
+const readerMapOrgName = ref("");
+const heatMapOrgName = ref("");
 const translatedReaderMapOrgName = computed(() => {
-  if (!readerMapOrgName.value) return '';
-  return locale.value === 'th'
-      ? readerMapOrgName.value?.th || readerMapOrgName.value
-      : readerMapOrgName.value?.en || readerMapOrgName.value;
+  if (!readerMapOrgName.value) return "";
+  return locale.value === "th"
+    ? readerMapOrgName.value?.th || readerMapOrgName.value
+    : readerMapOrgName.value?.en || readerMapOrgName.value;
 });
 const translatedHeatMapOrgName = computed(() => {
-  if (!heatMapOrgName.value) return '';
-  return locale.value === 'th'
-      ? heatMapOrgName.value?.th || heatMapOrgName.value
-      : heatMapOrgName.value?.en || heatMapOrgName.value;
+  if (!heatMapOrgName.value) return "";
+  return locale.value === "th"
+    ? heatMapOrgName.value?.th || heatMapOrgName.value
+    : heatMapOrgName.value?.en || heatMapOrgName.value;
 });
-
-
 
 // New Dashboard 6-7-8
 
@@ -1444,63 +1854,102 @@ const totalData = ref({
   totalOrganizations: 0,
   totalSupplies: 0,
   totalReaders: 0,
-  totalRfidTags: 0
+  totalRfidTags: 0,
 });
 const readerStatus = ref({
   readerOnline: 0,
-  readerOffline: 0
+  readerOffline: 0,
 });
 const tagStats = ref([]);
 const tagStats2 = ref([]);
 const suppliesStats = ref([]);
 
 const fetchDashboard6 = async () => {
-  const res = await api.get('/api/dashboard', { params: { optionType: 6 } });
-  console.log('Dashboard 6: ',res.data);
+  const res = await api.get("/api/dashboard", { params: { optionType: 6 } });
+  console.log("Dashboard 6: ", res.data);
   totalData.value = res.data;
 };
 
 const fetchDashboard7 = async () => {
-  const res = await api.get('/api/dashboard', { params: { optionType: 7 } });
-  console.log('Dashboard 7: ',res.data);
+  const res = await api.get("/api/dashboard", { params: { optionType: 7 } });
+  console.log("Dashboard 7: ", res.data);
   readerStatus.value = res.data;
 };
 
 const fetchDashboard8 = async () => {
-  const res = await api.get('/api/dashboard', { params: { optionType: 8 } });
-  console.log('Dashboard 8: ',res.data);
+  const res = await api.get("/api/dashboard", { params: { optionType: 8 } });
+  console.log("Dashboard 8: ", res.data);
   const d = res.data;
   tagStats.value = [
-    { label: 'dashboard.stats.readyTags', value: d.readyTags, color: 'purple-lighten-2' },
-    { label: 'dashboard.stats.remainedTags', value: d.remainedTags, color: 'deep-purple-lighten-2' },
-    { label: 'dashboard.stats.usingTags', value: d.usingTags, color: 'teal-lighten-2' },
-    { label: 'dashboard.stats.usedTags', value: d.usedTags, color: 'blue-lighten-2' }
+    {
+      label: "dashboard.stats.readyTags",
+      value: d.readyTags,
+      color: "purple-lighten-2",
+    },
+    {
+      label: "dashboard.stats.remainedTags",
+      value: d.remainedTags,
+      color: "deep-purple-lighten-2",
+    },
+    {
+      label: "dashboard.stats.usingTags",
+      value: d.usingTags,
+      color: "teal-lighten-2",
+    },
+    {
+      label: "dashboard.stats.usedTags",
+      value: d.usedTags,
+      color: "blue-lighten-2",
+    },
   ];
 };
 
 const fetchDashboard9 = async () => {
-  const res = await api.get('/api/dashboard', { params: { optionType: 9 } });
-  console.log('Dashboard 9: ',res.data);
+  const res = await api.get("/api/dashboard", { params: { optionType: 9 } });
+  console.log("Dashboard 9: ", res.data);
   const d = res.data;
   suppliesStats.value = [
-    { label: 'dashboard.stats.trackingActive', value: d.activeSupplies, color: 'purple-lighten-2' },
-    { label: 'dashboard.stats.trackingInactive', value: d.inactiveSupplies, color: 'deep-purple-lighten-2' },
-    { label: 'dashboard.stats.trackingLost', value: d.lostSupplies, color: 'teal-lighten-2' },
+    {
+      label: "dashboard.stats.trackingActive",
+      value: d.activeSupplies,
+      color: "purple-lighten-2",
+    },
+    {
+      label: "dashboard.stats.trackingInactive",
+      value: d.inactiveSupplies,
+      color: "deep-purple-lighten-2",
+    },
+    {
+      label: "dashboard.stats.trackingLost",
+      value: d.lostSupplies,
+      color: "teal-lighten-2",
+    },
   ];
 };
 
 const fetchDashboard10 = async () => {
-  const res = await api.get('/api/dashboard', { params: { optionType: 10 } });
-  console.log('Dashboard 10: ',res.data);
+  const res = await api.get("/api/dashboard", { params: { optionType: 10 } });
+  console.log("Dashboard 10: ", res.data);
   const d = res.data;
   tagStats2.value = [
-    { label: 'dashboard_10_using', value: d.tagInUsing, color: 'purple-lighten-2' },
-    { label: 'dashboard_10_remain', value: d.tagInRemaining, color: 'deep-purple-lighten-2' },
-    { label: 'dashboard_10_damaged', value: d.tagDamaged, color: 'deep-purple-lighten-2' }
+    {
+      label: "dashboard_10_using",
+      value: d.tagInUsing,
+      color: "purple-lighten-2",
+    },
+    {
+      label: "dashboard_10_remain",
+      value: d.tagInRemaining,
+      color: "deep-purple-lighten-2",
+    },
+    {
+      label: "dashboard_10_damaged",
+      value: d.tagDamaged,
+      color: "deep-purple-lighten-2",
+    },
   ];
 };
 
-/*
 let intervalId;
 onMounted(async () => {
   await fetchAllDashboards();
@@ -1508,28 +1957,26 @@ onMounted(async () => {
   intervalId = setInterval(() => {
     fetchAllDashboards();
   }, 5000);
-});*/
-
+});
 const fetchAllDashboards = async () => {
   try {
     await Promise.all([
       fetchDashboard6(),
       fetchDashboard7(),
       fetchDashboard9(),
-      fetchDashboard10()
+      fetchDashboard10(),
     ]);
   } catch (error) {
-    console.error('Error fetching dashboards:', error);
+    console.error("Error fetching dashboards:", error);
   }
 };
 
-/*
 onUnmounted(() => {
   // Clear the interval when component is destroyed
   if (intervalId) {
     clearInterval(intervalId);
   }
-});*/
+});
 
 onMounted(async () => {
   await Promise.all([
@@ -1541,7 +1988,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener("resize", handleResize);
   if (resizeTimeout) clearTimeout(resizeTimeout);
   if (readerMapUrl.value) {
     URL.revokeObjectURL(readerMapUrl.value);
@@ -1555,106 +2002,269 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Vuetify 3 table styles */
-:deep(.v-table) {
-  background-color: #ffffff !important;
+/* สไตล์ทั่วไป */
+.dashboard-container {
+  background-color: #f5f7fa;
+  padding: 16px !important;
 }
-:deep(.v-table th) {
-  color: rgba(2, 2, 2, 0.9) !important;
-  background-color: #a6d6d6 !important;
-  font-weight: bold;
-  white-space: nowrap;
-}
-/* Hover effect */
-:deep(.v-table tbody tr:hover td) {
-  background: #ccccca !important;
-}
-.empty-state-container {
-  padding: 20px;
-  border-radius: 8px;
-  background-color: white;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 2px dashed #e0e0e0;
-}
-.empty-state-container .v-icon {
-  opacity: 0.5;
-}
+
+/* ปรับแต่ง Card ให้มีมิติที่สวยงาม */
 .v-card {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  overflow: hidden;
+}
+
+.v-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Card แสดงข้อมูลสถิติ */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* เพิ่ม Gradient สีให้กับการ์ด */
+.gradient-red {
+  background: linear-gradient(135deg, #ff5252 0%, #b33939 100%) !important;
+  color: white !important;
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  color: white !important;
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%) !important;
+  color: white !important;
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%) !important;
+  color: white !important;
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%) !important;
+  color: white !important;
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%) !important;
+  color: white !important;
+}
+
+.gradient-yellow {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%) !important;
+  color: #333 !important;
+}
+
+.gradient-gray {
+  background: linear-gradient(135deg, #485563 0%, #29323c 100%) !important;
+  color: white !important;
+}
+
+/* ปรับแต่ง Icon ใน Card */
+.card-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  opacity: 0.8;
   transition: all 0.3s ease;
 }
-.v-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+.stat-card:hover .card-icon {
+  transform: scale(1.1);
+  opacity: 1;
 }
-.error-card {
-  background-color: rgb(254, 242, 242);
-  border: 1px solid rgb(254, 226, 226);
-}
-.error-card:hover {
-  transform: none;
-}
-.error-state-card {
-  background-color: rgb(254, 242, 242);
-  border: 1px solid rgb(254, 226, 226);
-  height: 100%;
-}
-.error-state-card.small {
-  min-height: 100px;
-}
-.error-state-card.medium {
-  min-height: 150px;
-}
-.error-state-card.large {
-  min-height: 200px;
-}
-.retry-button {
-  text-transform: none;
-  letter-spacing: normal;
-}
-.error-state-card:hover {
-  transform: none !important;
-  box-shadow: none !important;
-}
-@keyframes ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
+
+/* ปรับปรุงแผนที่และกรอบ */
 .map-container {
   position: relative;
   width: 100%;
   height: 100%;
-  border: 2px solid rgb(142, 142, 139);
-  border-radius: 4px;
+  border-radius: 12px !important;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
+
+.map-container:hover {
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px);
+}
+
 .organization-map {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover; /* เปลี่ยนเป็น cover เพื่อให้ภาพเต็ม card */
+  transition: all 0.5s ease;
 }
+
 .organization-map.fullscreen {
   object-fit: contain;
   max-height: calc(100vh - 200px);
-  border: 2px solid #b3b1b1;
-  border-radius: 5px; /* Optional: Rounded edges */
+  border-radius: 8px;
+  opacity: 0.8 !important; /* เพิ่มความชัดเจนขึ้น */
 }
-.map-marker {
+
+/* ปรับแต่ง Marker */
+.reader-marker {
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 2;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
 }
+
+.reader-marker:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+  z-index: 10;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Animation เมื่อ marker online/offline */
+.reader-marker .status-online {
+  animation: pulse-online 3s infinite;
+}
+
+.reader-marker .status-offline {
+  animation: pulse-offline 1.5s infinite;
+}
+
+@keyframes pulse-online {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(76, 175, 80, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(76, 175, 80, 0.5));
+  }
+}
+
+@keyframes pulse-offline {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(244, 67, 54, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(244, 67, 54, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(244, 67, 54, 0.5));
+  }
+}
+
+/* ปรับแต่ง RFID Cluster */
+.tag-cluster {
+  position: absolute;
+  z-index: 25;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cluster-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.tag-cluster:hover .cluster-marker {
+  transform: scale(1.15);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35), 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.cluster-count {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ปรับแต่งปุ่มนำทางบนแผนที่ */
+.map-navigation-btn {
+  z-index: 20 !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  transition: all 0.3s ease !important;
+}
+
+.map-navigation-btn:hover {
+  background-color: white !important;
+  transform: translateY(-50%) scale(1.1) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.map-navigation-btn:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+/* สถานะกำลังกระพริบ */
+.blinking {
+  animation: blink-animation 2s ease-in-out infinite;
+  background: linear-gradient(135deg, #485563 0%, #29323c 100%) !important;
+  color: white !important;
+}
+
+@keyframes blink-animation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ปรับแต่ง Dialog แสดงรายละเอียด */
+.v-dialog .v-card {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.v-dialog .v-card-title {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px !important;
+}
+
+/* ปรับแต่ง Fullscreen ของแผนที่ */
 .fullscreen-card {
   position: fixed;
   top: 64px;
@@ -1663,14 +2273,13 @@ onUnmounted(() => {
   bottom: 0;
   z-index: 100;
   margin: 16px;
-  transition: all 0.3s ease;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  background: white;
 }
-.position-relative {
-  position: relative;
-}
-.h-100 {
-  height: 100%;
-}
+
+/* ปรับแต่ง Fullscreen ของกราฟ */
 .chart-fullscreen-container {
   position: fixed;
   top: 50%;
@@ -1680,207 +2289,153 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  padding: 24px;
 }
+
 .fullscreen-card-chart {
   margin: auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 16px !important;
+  width: 80% !important;
+  max-width: 1200px !important;
 }
-.reader-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 2;
+
+/* ปรับแต่ง Data Table */
+:deep(.v-table) {
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.v-table th) {
+  color: rgba(0, 0, 0, 0.85) !important;
+  background: linear-gradient(to right, #a6d6d6, #b9e1e1) !important;
+  font-weight: bold !important;
+  white-space: nowrap !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  letter-spacing: 0.5px !important;
+}
+
+:deep(.v-table td) {
+  padding: 10px 16px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Hover effect */
+:deep(.v-table tbody tr:hover td) {
+  background: linear-gradient(to right, #f1f1f1, #e9e9e9) !important;
+}
+
+/* โครงร่างของ Empty State */
+.empty-state-container {
+  padding: 24px;
+  border-radius: 12px;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #e0e0e0;
   transition: all 0.3s ease;
 }
-.reader-marker:hover {
-  transform: translate(-50%, -50%) scale(1.2);
-  z-index: 3;
-}
-/* Add blinking effect for online/offline status */
-.reader-marker .v-icon {
-  animation: blink 2s infinite;
-}
-.reader-summary-marker {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  cursor: pointer;
-}
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-.blinking {
-  animation: blink 5s infinite;
-}
-/* Different blink speeds based on status */
-.reader-marker .status-online {
-  animation: blink 2s infinite;
-}
-.reader-marker .status-offline {
-  animation: blink 1s infinite;
-}
-/* Optional: Pulsing effect */
-.reader-marker::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-  z-index: -1;
-}
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-}
-.reader-loading,
-.reader-error {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 4px;
-  border-radius: 4px;
+
+.empty-state-container:hover {
+  border-color: #bdbdbd;
+  background-color: #fafafa;
 }
 
-/* Improve navigation buttons visibility and interaction */
-.map-navigation-btn {
-  z-index: 20 !important; /* Ensure buttons are on top */
-  background-color: rgba(255, 255, 255, 0.7) !important; /* Semi-transparent background */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Add shadow for depth */
-  transition: all 0.2s ease !important;
+.empty-state-container .v-icon {
+  opacity: 0.7;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
 }
 
-.map-navigation-btn:hover {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  transform: translateY(-50%) scale(1.1) !important;
+/* ปุ่ม Export Report */
+.export-button {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff5f17 100%) !important;
+  color: white !important;
+  font-weight: bold !important;
+  box-shadow: 0 3px 5px rgba(255, 140, 0, 0.3) !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+  text-transform: none !important;
 }
 
-.map-navigation-btn:active {
-  transform: translateY(-50%) scale(0.95) !important;
+.export-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 10px rgba(255, 140, 0, 0.4) !important;
 }
-.debug-info {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 100;
-  max-width: 80%;
+
+.export-label {
+  color: #ff8c00;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
-.rfid-test-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 20;
+
+/* สไตล์สำหรับสถานะการติดตาม */
+.status-active {
+  background-color: #4caf50 !important;
+  color: white !important;
 }
-.rfid-test-container .test-marker {
-  pointer-events: auto;
-  cursor: pointer;
+
+.status-inactive {
+  background-color: #ff9800 !important;
+  color: white !important;
 }
-.tag-loading, .tag-error {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 4px;
-  border-radius: 4px;
+
+.status-lost {
+  background-color: #f44336 !important;
+  color: white !important;
 }
-.tag-cluster {
-  position: absolute;
-  z-index: 25;
-  pointer-events: auto;
-  cursor: pointer;
-  transition: all 0.5s ease-out; /* Smooth transition */
+
+/* ปรับแต่ง Progress Circular */
+:deep(.v-progress-circular) {
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
 }
-.cluster-marker {
-  pointer-events: auto;
-  cursor: pointer;
-}
-.tag-cluster .cluster-marker:hover {
-  transform: scale(1.1);
-  cursor: pointer;
-}
-.tag-cluster .cluster-marker {
-  animation: blink 1s infinite;
-}
-.tag-cluster .cluster-marker {
-  animation: blink 2s infinite;
+
+.rfid-status-card {
+  min-height: 100px; /* ปรับลดความสูงจาก 120px เป็น 100px หรือค่าที่เหมาะสม */
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.rfid-status-card .v-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s;
-  cursor: pointer;
+  padding-top: 12px !important; /* เพิ่ม padding ด้านบนลงไป */
+  padding-bottom: 12px !important; /* เพิ่ม padding ด้านล่างลงไป */
 }
-.tag-cluster .cluster-marker:hover {
-  transform: scale(1.1);
+
+/* เพิ่มสไตล์นี้ที่ส่วน <style> ของ PageDashboard.vue */
+.stat-card[style*="cursor: pointer"]:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
 }
-.cluster-count {
-  color: white;
-  font-weight: bold;
-  font-size: 12px;
-}
-.tag-count-badge {
+
+.stat-card[style*="cursor: pointer"]::after {
+  content: "";
   position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
+  bottom: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" opacity="0.7"><path d="M12 6V9L16 5L12 1V4C7.58 4 4 7.58 4 12C4 13.57 4.46 15.03 5.24 16.26L6.7 14.8C6.25 13.97 6 13.01 6 12C6 8.69 8.69 6 12 6M18.76 7.74L17.3 9.2C17.74 10.04 18 10.99 18 12C18 15.31 15.31 18 12 18V15L8 19L12 23V20C16.42 20 20 16.42 20 12C20 10.43 19.54 8.97 18.76 7.74Z" /></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-.map-legend {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 8px;
-  border-radius: 4px;
-  z-index: 10;
-  font-size: 12px;
-}
-.legend-title {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-top: 2px;
-}
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  margin-right: 6px;
-}
-.top-left-icon {
-  top: 8px;
-  left: 8px;
-  position: absolute;
+
+.stat-card[style*="cursor: pointer"]:hover::after {
+  opacity: 1;
 }
 </style>
